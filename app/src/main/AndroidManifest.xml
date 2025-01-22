@@ -8,6 +8,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/icons_message"
         android:label="@string/app_name"
+        android:name=".MessengerApplication"
         android:roundIcon="@drawable/icons_message"
         android:supportsRtl="true"
         android:theme="@style/Theme.Messenger"
