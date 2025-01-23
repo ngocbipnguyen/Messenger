@@ -11,6 +11,10 @@ android {
     namespace = "com.bachnn.messenger"
     compileSdk = 35
 
+    packagingOptions {
+        resources.excludes.add("META-INF/DEPENDENCIES")
+    }
+
     defaultConfig {
         applicationId = "com.bachnn.messenger"
         minSdk = 24
@@ -91,12 +95,11 @@ dependencies {
 
     // firebase
     implementation("com.google.firebase:firebase-auth:23.1.0")
+    implementation("com.google.firebase:firebase-firestore:25.1.1")
 
-//    implementation("com.google.firebase:firebase-firestore:25.1.0")
-//    implementation("com.google.firebase:firebase-messaging:24.0.1")
-//    implementation("com.google.firebase:firebase-auth:23.0.0")
-//    implementation("com.google.firebase:firebase-storage:21.0.0")
-//    implementation ("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.google.firebase:firebase-messaging:24.0.1")
+    implementation("com.google.firebase:firebase-storage:21.0.0")
+    implementation ("com.google.android.gms:play-services-auth:21.2.0")
 
     //google sign
     implementation ("androidx.credentials:credentials:1.2.2")

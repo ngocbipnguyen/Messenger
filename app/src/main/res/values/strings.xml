@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Messenger</string>
+
+    <string name="default_web_client_id">28015991801-ioauguk4k6k2drclfmibek9a0a7vcvld.apps.googleusercontent.com</string>
+    <string name="title_home">Messenger</string>
+
 </resources>
