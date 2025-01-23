@@ -6,6 +6,8 @@ class FirebaseConstants {
         // rootPath
         const val pathUser = "user";
         const val pathMessages = "messages";
+        const val timestamp = "timestamp";
+
 
         // user
         const val uid = "uid";

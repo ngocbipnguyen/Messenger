@@ -5,6 +5,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import com.bachnn.messenger.base.BaseFragment
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.HomeFragmentBinding
@@ -46,6 +47,9 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
         }
 
         adapter = HomeAdapter(listUsers, onClickUser = {
+            val action = HomeFragmentDirections.actionHomeFragmentToMessengerFragment()
+            action.userArg = it
+            binding.root.findNavController().navigate(action)
 
         })
 

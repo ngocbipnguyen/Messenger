@@ -24,7 +24,11 @@
         android:name="com.bachnn.messenger.ui.fragment.HomeFragment"
         android:label="HomeFragment"
         tools:layout="@layout/home_fragment"
-        />
+        >
+        <action
+            android:id="@+id/action_homeFragment_to_messengerFragment"
+            app:destination="@id/messengerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.bachnn.messenger.ui.fragment.LoginFragment"
@@ -35,5 +39,16 @@
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/messengerFragment"
+        android:name="com.bachnn.messenger.ui.fragment.MessengerFragment"
+        android:label="MessengerFragment"
+        tools:layout="@layout/messenger_fragment">
+        <argument
+            android:name="userArg"
+            app:argType="com.bachnn.messenger.data.model.User"
+            app:nullable="true"
+            android:defaultValue="@null"/>
     </fragment>
 </navigation>
