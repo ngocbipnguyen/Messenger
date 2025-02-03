@@ -27,6 +27,10 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     override fun initView() {
         userTo = MessengerFragmentArgs.fromBundle(requireArguments()).userArg!!
 
+        binding.messengerToolbar.title = userTo.name
+
+
+
 
 
     }
