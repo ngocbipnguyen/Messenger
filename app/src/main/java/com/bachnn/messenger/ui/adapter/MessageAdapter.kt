@@ -26,10 +26,12 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
 
         private val messageText : TextView
         private val messageImage: ImageView
+        val sendingText: TextView
 
         init {
             messageText = view.findViewById(R.id.right_message_text)
             messageImage = view.findViewById(R.id.right_message_image)
+            sendingText = view.findViewById(R.id.sending)
         }
 
         override fun bind(message: Message) {
@@ -98,6 +100,12 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
     override fun getItemCount(): Int = messages.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        if (messages[position].idFrom == user.uid) {
+            val rightHolder : RightHolder = holder as RightHolder
+            rightHolder.bind(messages[position])
+        } else {
+            val leftHolder : LeftHolder = holder as LeftHolder
+            leftHolder.bind(messages[position])
+        }
     }
 }

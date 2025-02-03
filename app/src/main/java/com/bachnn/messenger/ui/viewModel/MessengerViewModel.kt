@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MessengerViewModel @Inject constructor(
-    private val auth: FirebaseAuth,
+    val auth: FirebaseAuth,
     private val fireStore: FirebaseFirestore
 ) : BaseViewModel() {
 
@@ -27,6 +27,10 @@ class MessengerViewModel @Inject constructor(
     private var _messages = MutableLiveData<List<Message>>()
 
     val messages : LiveData<List<Message>> = _messages
+
+    private var _isVisibilitySending = MutableLiveData<Boolean>()
+
+    val isVisibilitySending: LiveData<Boolean> = _isVisibilitySending
 
     lateinit var group: String
 
@@ -92,10 +96,7 @@ class MessengerViewModel @Inject constructor(
     }
 
 
-    fun sendMessage(toID: String, content: String, type: String, token: String) {
-        val datetime = Date()
-        val timestamps: String = datetime.time.toString()
-
+    fun sendMessage(toID: String, content: String, type: String,timestamps: String, token: String) {
 
         val messageData : MutableMap<String, Any> = HashMap()
 
@@ -109,9 +110,13 @@ class MessengerViewModel @Inject constructor(
         fireStore.collection(FirebaseConstants.pathMessages).document(group).collection(group).document(timestamps)
             .set(messageData).addOnCompleteListener{
                 // todo push notification..
-
+                _isVisibilitySending.postValue(false)
             }
 
+    }
+
+    fun setVisibilitySending(isVisible: Boolean) {
+        _isVisibilitySending.postValue(isVisible)
     }
 
 }
