@@ -4,5 +4,6 @@
     <string name="default_web_client_id">28015991801-ioauguk4k6k2drclfmibek9a0a7vcvld.apps.googleusercontent.com</string>
     <string name="title_home">Messenger</string>
     <string name="sending">Sending</string>
+    <string name="open_setting_permission">App needs permission in your device settings.</string> <!--/*INCV-1487*/-->
 
 </resources>

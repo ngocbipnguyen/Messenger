@@ -1,11 +1,16 @@
 package com.bachnn.messenger.ui.fragment
 
+import android.Manifest
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -43,7 +48,38 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     private lateinit var pathFile: File
     private lateinit var dateCamera: Date
 
-    val openCameraIntent = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+
+    // Register ActivityResult handler
+    private val requestPermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            val isGranted: Boolean =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                results[Manifest.permission.READ_MEDIA_IMAGES] ?: false ||
+                        results[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] ?: false
+            } else {
+                results[Manifest.permission.READ_MEDIA_IMAGES] ?: false
+            }
+
+            if (isGranted) {
+                /*todo: open show list photo and video*/
+
+
+            } else {
+                //todo show dialog ask media permission.
+                val dialog = AlertDialog.Builder(requireContext())
+                    .setMessage(requireContext().getString(R.string.open_setting_permission))
+                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        val intents = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri = Uri.fromParts("package", requireContext().packageName, null)
+                        intents.data = uri
+                        startActivity(intents)
+                        dialog.cancel()
+                    }
+                dialog.show()
+            }
+        }
+
+    private val openCameraIntent = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         if (it) {
             // save image in cloud and delete file image save in cache.
             lifecycleScope.launch {
@@ -133,6 +169,11 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             openCamera()
         }
 
+        binding.photoIcon.setOnClickListener {
+            //todo : select photo and video in gallery.
+            requestPermissionGallery()
+        }
+
     }
 
     private fun setVisibleSending(
@@ -174,5 +215,30 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         viewModel.sendMessage(userTo.uid, uriImage.toString(), Constants.TYPE_IMAGE, timestamps, userTo.token)
 
     }
+
+    /*todo gallery*/
+    private fun requestPermissionGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            requestPermissions.launch(
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+                )
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions.launch(
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO
+                )
+            )
+        } else {
+            //todo open gallery device.
+//            requestPermissions.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+        }
+    }
+
+
 
 }
