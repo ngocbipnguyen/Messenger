@@ -15,6 +15,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bachnn.messenger.R
@@ -55,14 +56,17 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             val isGranted: Boolean =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 results[Manifest.permission.READ_MEDIA_IMAGES] ?: false ||
+                results[Manifest.permission.READ_MEDIA_VIDEO] ?: false ||
                         results[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] ?: false
             } else {
                 results[Manifest.permission.READ_MEDIA_IMAGES] ?: false
+                results[Manifest.permission.READ_MEDIA_VIDEO] ?: false
             }
 
             if (isGranted) {
                 /*todo: open show list photo and video*/
-
+                val action = MessengerFragmentDirections.actionMessengerFragmentToMediaFragment()
+                binding.root.findNavController().navigate(action)
 
             } else {
                 //todo show dialog ask media permission.

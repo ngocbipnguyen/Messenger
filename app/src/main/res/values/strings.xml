@@ -6,4 +6,8 @@
     <string name="sending">Sending</string>
     <string name="open_setting_permission">App needs permission in your device settings.</string> <!--/*INCV-1487*/-->
 
+
+    <string name="access_limit_text">You\'ve given access to a select number of photos and videos</string>
+    <string name="manage">Manage</string>
+
 </resources>

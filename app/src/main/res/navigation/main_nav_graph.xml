@@ -50,5 +50,13 @@
             app:argType="com.bachnn.messenger.data.model.User"
             app:nullable="true"
             android:defaultValue="@null"/>
+        <action
+            android:id="@+id/action_messengerFragment_to_mediaFragment"
+            app:destination="@id/mediaFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/mediaFragment"
+        android:name="com.bachnn.messenger.ui.fragment.MediaFragment"
+        android:label="MediaFragment"
+        tools:layout="@layout/media_fragment"/>
 </navigation>
