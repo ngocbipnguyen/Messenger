@@ -23,7 +23,7 @@
         android:layout_marginBottom="2dp">
 
         <TextView
-            android:id="@+id/right_message_text"
+            android:id="@+id/left_message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/background_message_text"
@@ -47,6 +47,7 @@
             android:layout_gravity="left"
             >
             <ImageView
+                android:id="@+id/left_message_image"
                 android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:maxWidth="280dp"

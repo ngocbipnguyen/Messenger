@@ -48,15 +48,17 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
         binding.messengerRecycler.adapter = adapter
 
-        viewModel.setIdMessage(userTo.uid)
 
         viewModel.messages.observe(this, Observer { it ->
-            if (it.isNotEmpty()) {
+            if (it != null) {
                 messages.clear()
                 messages.addAll(it)
                 adapter.notifyDataSetChanged()
             }
         })
+
+        viewModel.setIdMessage(userTo.uid)
+        viewModel.setListenerMessage()
 
         viewModel.isVisibilitySending.observe(this, Observer { it ->
             if (it) {
@@ -80,7 +82,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 val datetime = Date()
                 val timestamps: String = datetime.time.toString()
                 binding.messageEdit.text.clear()
-                messages.add(
+                messages.add(0,
                     Message(
                         viewModel.auth.currentUser?.uid!!,
                         userTo.uid,
@@ -89,6 +91,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                         Constants.TYPE_TEXT
                     )
                 )
+                adapter.notifyItemInserted(0)
                 viewModel.setVisibilitySending(true)
                 viewModel.sendMessage(
                     userTo.uid,

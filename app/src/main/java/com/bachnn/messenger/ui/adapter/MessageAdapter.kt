@@ -49,7 +49,7 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
     }
 
 
-    class LeftHolder(view: View, user: User) : ViewHolder(view) {
+    class LeftHolder(view: View,private val user: User) : ViewHolder(view) {
 
         private val circleImage : CircleImageView
         private val messageText: TextView
@@ -58,11 +58,11 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
 
         init {
             circleImage = view.findViewById(R.id.circle_image)
-            messageText = view.findViewById(R.id.right_message_text)
-            messageImage = view.findViewById(R.id.right_message_image)
+            messageText = view.findViewById(R.id.left_message_text)
+            messageImage = view.findViewById(R.id.left_message_image)
         }
         override fun bind(message: Message) {
-            Glide.with(view).load(message.content).into(circleImage)
+            Glide.with(view).load(user.photoUrl).into(circleImage)
             if (message.type == Constants.TYPE_TEXT) {
                 messageText.text = message.content
                 messageText.visibility = View.VISIBLE
@@ -79,9 +79,9 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
 
     override fun getItemViewType(position: Int): Int {
         return if (messages[position].idFrom == user.uid) {
-            return Constants.RIGHT_MESSAGE
-        } else {
             return Constants.LEFT_MESSAGE
+        } else {
+            return Constants.RIGHT_MESSAGE
         }
     }
 
@@ -101,11 +101,11 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (messages[position].idFrom == user.uid) {
-            val rightHolder : RightHolder = holder as RightHolder
-            rightHolder.bind(messages[position])
-        } else {
             val leftHolder : LeftHolder = holder as LeftHolder
             leftHolder.bind(messages[position])
+        } else {
+            val rightHolder : RightHolder = holder as RightHolder
+            rightHolder.bind(messages[position])
         }
     }
 }
