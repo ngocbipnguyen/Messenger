@@ -9,10 +9,10 @@ import com.bachnn.messenger.R
 import com.bachnn.messenger.data.model.Media
 import com.bumptech.glide.Glide
 
-class MediaAdapter(private val medias: List<Media>, onClickMedia: (Media) -> Unit) : RecyclerView.Adapter<MediaAdapter.ViewHolder>() {
+class MediaAdapter(private val medias: List<Media>,val onClickMedia: (Media) -> Unit) : RecyclerView.Adapter<MediaAdapter.ViewHolder>() {
 
 
-    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(val view: View, val onClickMedia: (Media) -> Unit) : RecyclerView.ViewHolder(view) {
 
         val imageView: ImageView
         val videoView: ImageView
@@ -28,10 +28,16 @@ class MediaAdapter(private val medias: List<Media>, onClickMedia: (Media) -> Uni
             if (media.mimeType.contains("image")) {
                 imageView.visibility = View.VISIBLE
                 Glide.with(view).load(media.uri).into(imageView)
+                imageView.setOnClickListener {
+                    onClickMedia(media)
+                }
             } else {
                 videoView.visibility = View.VISIBLE
                 iconView.visibility = View.VISIBLE
                 Glide.with(view).load(media.uri).into(videoView)
+                videoView.setOnClickListener {
+                    onClickMedia(media)
+                }
             }
         }
 
@@ -40,7 +46,7 @@ class MediaAdapter(private val medias: List<Media>, onClickMedia: (Media) -> Uni
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_media, parent,false)
-        return ViewHolder(view)
+        return ViewHolder(view, onClickMedia)
     }
 
     override fun getItemCount(): Int = medias.size

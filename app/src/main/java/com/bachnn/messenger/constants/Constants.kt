@@ -11,5 +11,9 @@ class Constants {
         const val RIGHT_MESSAGE = 0
         const val LEFT_MESSAGE = 1
 
+        const val REQUEST_MEDIA = "request_media"
+        const val MEDIA_URI = "media_uri"
+
+
     }
 }

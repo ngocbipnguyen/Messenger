@@ -1,20 +1,19 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.bachnn.messenger.R
+import androidx.navigation.findNavController
 import com.bachnn.messenger.base.BaseFragment
+import com.bachnn.messenger.constants.Constants
 import com.bachnn.messenger.data.model.Media
 import com.bachnn.messenger.databinding.MediaFragmentBinding
 import com.bachnn.messenger.ui.adapter.MediaAdapter
@@ -69,14 +68,24 @@ class MediaFragment : BaseFragment<MediaViewModel, MediaFragmentBinding>() {
 
         mediaAdapter = MediaAdapter(medias, onClickMedia = {
             // todo back message screen
+            setFragmentResult(
+                Constants.REQUEST_MEDIA,
+                bundleOf(
+                    Constants.MEDIA_URI to it.uri.toString()
+                )
+            )
+            binding.root.findNavController().popBackStack()
+
         })
 
         binding.mediaRecyclerview.adapter = mediaAdapter
 
         viewModel.medias.observe(this, Observer {
-            medias.clear()
-            medias.addAll(it)
-            mediaAdapter.notifyDataSetChanged()
+            if (!isDetached) {
+                medias.clear()
+                medias.addAll(it)
+                mediaAdapter.notifyDataSetChanged()
+            }
         })
 
         viewModel.getAllMedia(requireContext().contentResolver)

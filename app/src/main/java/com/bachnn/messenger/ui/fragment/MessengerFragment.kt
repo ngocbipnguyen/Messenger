@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -92,6 +94,15 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         }
     }
 
+    private val getGalleryIntent = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        lifecycleScope.launch {
+            it?.let {
+                dateCamera = Date()
+                uploadImages(it)
+            }
+        }
+    }
+
 
     override fun createViewModel(): MessengerViewModel {
         return ViewModelProvider(this)[MessengerViewModel::class]
@@ -106,6 +117,16 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
     override fun initView() {
         userTo = MessengerFragmentArgs.fromBundle(requireArguments()).userArg!!
+
+        setFragmentResultListener(Constants.REQUEST_MEDIA) { _, bundle ->
+            val uri = bundle.getString(Constants.MEDIA_URI)
+            if (uri != null) {
+                lifecycleScope.launch {
+                    dateCamera = Date()
+                    uploadImages(uri.toUri())
+                }
+            }
+        }
 
         binding.messengerToolbar.title = userTo.name
 
@@ -211,11 +232,11 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
     private suspend fun uploadImages(uriImage: Uri) {
         val timestamps = dateCamera.time.toString()
-        val folderMedia = "${viewModel.group}/$timestamps"
-        FirebaseStorage.getInstance().reference.child(folderMedia).putFile(uriImage).await()
-        val url = FirebaseStorage.getInstance().reference.child(folderMedia).downloadUrl.await()
-
-        Log.e("uploadImages", "url : $url")
+//        val folderMedia = "${viewModel.group}/$timestamps"
+//        FirebaseStorage.getInstance().reference.child(folderMedia).putFile(uriImage).await()
+//        val url = FirebaseStorage.getInstance().reference.child(folderMedia).downloadUrl.await()
+//
+//        Log.e("uploadImages", "url : $url")
         viewModel.sendMessage(userTo.uid, uriImage.toString(), Constants.TYPE_IMAGE, timestamps, userTo.token)
 
     }
@@ -238,8 +259,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 )
             )
         } else {
-            //todo open gallery device.
-//            requestPermissions.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+            getGalleryIntent.launch("video/*, image/*")
         }
     }
 
