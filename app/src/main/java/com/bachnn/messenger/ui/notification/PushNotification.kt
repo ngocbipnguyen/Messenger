@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.bachnn.messenger.R
 import com.bachnn.messenger.constants.Constants
+import com.bachnn.messenger.constants.FirebaseConstants
 import com.bachnn.messenger.data.model.User
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.auth.oauth2.GoogleCredentials
@@ -63,11 +64,19 @@ class PushNotification {
 //                .createPendingIntent()
 //
 
+            val pendingIntent = NavDeepLinkBuilder(context)
+                .setGraph(R.navigation.main_nav_graph)
+                .addDestination(R.id.messengerFragment)
+                .setArguments(Bundle().apply {
+                    putString("userArg", user.uid)
+                })
+                .createPendingIntent()
+
             var builder = NotificationCompat.Builder(context, Constants.CHANNEL_ID)
                 .setSmallIcon(R.drawable.icons_message)
                 .setContentTitle(name)
                 .setContentText(message)
-//                .setContentIntent(pendingIntent)
+                .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
 

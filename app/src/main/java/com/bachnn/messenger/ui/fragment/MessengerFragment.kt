@@ -27,6 +27,7 @@ import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.MessengerFragmentBinding
 import com.bachnn.messenger.ui.adapter.MessageAdapter
+import com.bachnn.messenger.ui.notification.PushNotification
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
@@ -198,6 +199,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             //todo : select photo and video in gallery.
             requestPermissionGallery()
         }
+
+//        PushNotification.showNotification(requireContext(), "bachnn","hello world!", User("","","","","",""))
 
     }
 
