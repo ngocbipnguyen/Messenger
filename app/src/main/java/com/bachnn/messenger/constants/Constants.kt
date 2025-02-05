@@ -15,5 +15,8 @@ class Constants {
         const val MEDIA_URI = "media_uri"
 
 
+        const val NOTIFICATION_ID = 321
+        const val CHANNEL_ID = "message_CHANNEL"
+
     }
 }

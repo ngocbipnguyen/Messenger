@@ -1,5 +1,7 @@
 package com.bachnn.messenger.ui.viewModel
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -7,18 +9,27 @@ import com.bachnn.messenger.base.BaseViewModel
 import com.bachnn.messenger.constants.FirebaseConstants
 import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
+import com.bachnn.messenger.ui.notification.PushNotification
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class MessengerViewModel @Inject constructor(
+    @ApplicationContext val context: Context,
     val auth: FirebaseAuth,
     private val fireStore: FirebaseFirestore
 ) : BaseViewModel() {
@@ -34,6 +45,8 @@ class MessengerViewModel @Inject constructor(
     val isVisibilitySending: LiveData<Boolean> = _isVisibilitySending
 
     lateinit var group: String
+
+    lateinit var currentToken: String
 
     init {
 
@@ -55,6 +68,12 @@ class MessengerViewModel @Inject constructor(
                     emailVerified,
                     ""
                 )
+            }
+
+            viewModelScope.launch {
+                val doc = fireStore.collection(FirebaseConstants.pathUser).document(auth.currentUser!!.uid).get().await()
+                currentToken = doc.get(FirebaseConstants.token).toString()
+                Log.e("MessengerViewModel", "currentToken : $currentToken")
             }
 
         }
@@ -112,6 +131,8 @@ class MessengerViewModel @Inject constructor(
             .set(messageData).addOnCompleteListener{
                 // todo push notification..
                 _isVisibilitySending.postValue(false)
+
+                pushMessageNotification(content, auth.currentUser!!.displayName!!,token)
             }
 
     }
@@ -143,5 +164,53 @@ class MessengerViewModel @Inject constructor(
                 }
             )
     }
+
+
+    private fun pushMessageNotification(content: String, title: String, token: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val client = OkHttpClient()
+            val json = JSONObject(convertToJson(content, title, token)).toString()
+
+            val serverKey = PushNotification.getAccessToken(context)
+
+            val request = Request.Builder()
+                .url("https://fcm.googleapis.com/v1/projects/messenger-7c6e4/messages:send")
+                .addHeader("Authorization", "Bearer $serverKey")
+                .addHeader("Content-Type", "application/json")
+                .post(json.toRequestBody("application/json".toMediaType()))
+                .build()
+
+            val response = client.newCall(request).execute()
+            Log.e("pushMessageNotification", "response : ${response}")
+        }
+    }
+
+
+    private fun convertToJson(content: String, title: String, token: String): Map<String, Any> {
+        return mapOf(
+            "message" to mapOf(
+                "token" to token,
+                "notification" to mapOf(
+                    "title" to title,
+                    "body" to content
+//                    "uid" to "auth.currentUser?.uid",
+//                    "displayName" to "auth.currentUser?.displayName",
+//                    "photoUrl" to "auth.currentUser?.photoUrl",
+//                    "currentToken" to currentToken
+                ),
+                "data" to mapOf(
+//                    "title" to auth.currentUser?.uid,
+//                    "message" to auth.currentUser?.photoUrl,
+//                    "customData" to currentToken
+                    "uid" to auth.currentUser?.uid,
+                    "displayName" to auth.currentUser?.displayName,
+                    "photoUrl" to auth.currentUser?.photoUrl,
+                    "currentToken" to currentToken
+                )
+            )
+        )
+    }
+
+
 
 }

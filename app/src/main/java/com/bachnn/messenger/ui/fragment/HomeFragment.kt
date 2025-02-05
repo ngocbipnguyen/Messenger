@@ -1,5 +1,6 @@
 package com.bachnn.messenger.ui.fragment
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -10,8 +11,11 @@ import com.bachnn.messenger.base.BaseFragment
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.HomeFragmentBinding
 import com.bachnn.messenger.ui.adapter.HomeAdapter
+import com.bachnn.messenger.ui.notification.PushNotification
 import com.bachnn.messenger.ui.viewModel.HomeViewModel
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -62,6 +66,18 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
                 adapter.notifyDataSetChanged()
             }
         })
+
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener {
+            if (!it.isSuccessful) {
+                Log.w("FirebaseMessaging", "Fetching FCM registration token failed", it.exception)
+            }
+
+            val token = it.result
+            viewModel.sendRegistrationToServer(token)
+        })
+
+        PushNotification.createNotificationChannel(requireContext())
 
     }
 }

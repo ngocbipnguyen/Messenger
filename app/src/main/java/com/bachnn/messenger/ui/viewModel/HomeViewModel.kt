@@ -1,11 +1,13 @@
 package com.bachnn.messenger.ui.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.bachnn.messenger.base.BaseViewModel
 import com.bachnn.messenger.constants.FirebaseConstants
 import com.bachnn.messenger.data.model.User
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +37,7 @@ class HomeViewModel @Inject constructor(
                 val email = doc.getString(FirebaseConstants.email).toString()
                 val photoUrl = doc.getString(FirebaseConstants.photoUrl).toString()
                 val emailVerified = doc.getString(FirebaseConstants.emailVerified).toString()
+                val token = doc.getString(FirebaseConstants.token).toString()
 
                 _currentUser.postValue(
                     User(
@@ -43,7 +46,7 @@ class HomeViewModel @Inject constructor(
                         email,
                         photoUrl,
                         emailVerified,
-                        ""
+                        token
                     )
                 )
             }
@@ -59,6 +62,7 @@ class HomeViewModel @Inject constructor(
                         val email = it.getString(FirebaseConstants.email).toString()
                         val photoUrl = it.getString(FirebaseConstants.photoUrl).toString()
                         val emailVerified = it.getString(FirebaseConstants.emailVerified).toString()
+                        val token = it.getString(FirebaseConstants.token).toString()
                         listUser.add(
                             User(
                                 it.id,
@@ -66,7 +70,7 @@ class HomeViewModel @Inject constructor(
                                 email,
                                 photoUrl,
                                 emailVerified,
-                                ""
+                                token
                             )
                         )
                     }
@@ -79,6 +83,22 @@ class HomeViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun sendRegistrationToServer(token: String) {
+        val uid = auth.currentUser?.uid
+
+        val mapUser: MutableMap<String, Any> = HashMap()
+        mapUser[FirebaseConstants.token] = token
+
+        fireStore.collection(FirebaseConstants.pathUser).document(uid!!).update(mapUser).addOnCompleteListener(
+            OnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.e("HomeViewModel", "sendRegistrationToServer successful!")
+                } else {
+                    Log.e("HomeViewModel", "sendRegistrationToServer failure!")
+                }
+            })
     }
 
 }
