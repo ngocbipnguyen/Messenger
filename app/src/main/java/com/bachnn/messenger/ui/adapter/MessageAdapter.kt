@@ -1,19 +1,27 @@
 package com.bachnn.messenger.ui.adapter
 
+import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bachnn.messenger.MainActivity
 import com.bachnn.messenger.R
 import com.bachnn.messenger.constants.Constants
 import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
+import ro.andreidobrescu.emojilike.Emoji
+import ro.andreidobrescu.emojilike.EmojiConfig
+import ro.andreidobrescu.emojilike.EmojiLikeView
+import ro.andreidobrescu.emojilike.IActivityWithEmoji
 
-class MessageAdapter(val messages: List<Message>, val user: User) :
+class MessageAdapter(val context: MainActivity, val messages: List<Message>, val user: User) :
     RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
     abstract class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
@@ -49,18 +57,38 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
     }
 
 
-    class LeftHolder(view: View,private val user: User) : ViewHolder(view) {
+    class LeftHolder(val context: MainActivity,view: View,private val user: User) : ViewHolder(view) {
 
         private val circleImage : CircleImageView
         private val messageText: TextView
         private val messageImage: ImageView
+
+        private val emojiImage : EmojiLikeView
+        private val leftHolder: FrameLayout
 
 
         init {
             circleImage = view.findViewById(R.id.circle_image)
             messageText = view.findViewById(R.id.left_message_text)
             messageImage = view.findViewById(R.id.left_message_image)
+            leftHolder = view.findViewById(R.id.left_view)
+            emojiImage = view.findViewById(R.id.emoji_view)
+
+            EmojiConfig.with(context)
+                .on(leftHolder)
+                .open(emojiImage)
+                .addEmoji(Emoji(R.drawable.like, "Like"))
+                .addEmoji(Emoji(R.drawable.haha, "Haha"))
+                .addEmoji(Emoji(R.drawable.kiss, "Kiss"))
+                .addEmoji(Emoji(R.drawable.sad, "Sad"))
+                .addEmoji(Emoji(R.drawable.p, "P"))
+                .setOnEmojiSelectedListener { emoji ->
+                    Log.e("showEmoji", "select ${emoji.description}")
+                }
+                .setup()
+
         }
+
         override fun bind(message: Message) {
             Glide.with(view).load(user.photoUrl).into(circleImage)
             if (message.type == Constants.TYPE_TEXT) {
@@ -93,7 +121,7 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
         } else {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.left_message_item, parent, false)
-            LeftHolder(view, user)
+            LeftHolder(context,view, user)
         }
     }
 

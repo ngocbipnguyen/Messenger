@@ -16,6 +16,7 @@
 
 
     <FrameLayout
+        android:id="@+id/left_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -55,6 +56,11 @@
                 android:visibility="gone"
                 />
         </androidx.cardview.widget.CardView>
+
+        <ro.andreidobrescu.emojilike.EmojiLikeView
+            android:id="@+id/emoji_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
 
     </FrameLayout>

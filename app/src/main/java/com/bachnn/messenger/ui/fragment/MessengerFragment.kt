@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bachnn.messenger.MainActivity
 import com.bachnn.messenger.R
 import com.bachnn.messenger.base.BaseFragment
 import com.bachnn.messenger.constants.Constants
@@ -27,18 +27,17 @@ import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.MessengerFragmentBinding
 import com.bachnn.messenger.ui.adapter.MessageAdapter
-import com.bachnn.messenger.ui.notification.PushNotification
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import ro.andreidobrescu.emojilike.EmojiConfig
+import ro.andreidobrescu.emojilike.IActivityWithEmoji
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 
 @AndroidEntryPoint
-class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBinding>() {
+class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBinding>(), IActivityWithEmoji {
 
     lateinit var userTo: User
 
@@ -131,7 +130,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
         binding.messengerToolbar.title = userTo.name
 
-        adapter = MessageAdapter(messages, userTo)
+        adapter = MessageAdapter(activity as MainActivity,messages, userTo)
 
         binding.messengerRecycler.adapter = adapter
 
@@ -266,6 +265,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         }
     }
 
+    override fun configureEmojiLike(p0: EmojiConfig?) {
+    }
 
 
 }
