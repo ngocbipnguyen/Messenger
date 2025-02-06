@@ -68,7 +68,7 @@ class PushNotification {
                 .setGraph(R.navigation.main_nav_graph)
                 .addDestination(R.id.messengerFragment)
                 .setArguments(Bundle().apply {
-                    putString("userArg", user.uid)
+                    putSerializable("userArg", user)
                 })
                 .createPendingIntent()
 
