@@ -1,14 +1,19 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
+import android.R
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -27,15 +32,13 @@ import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.MessengerFragmentBinding
 import com.bachnn.messenger.ui.adapter.MessageAdapter
-import com.bachnn.messenger.ui.notification.PushNotification
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+
 
 @AndroidEntryPoint
 class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBinding>() {
@@ -131,7 +134,9 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
         binding.messengerToolbar.title = userTo.name
 
-        adapter = MessageAdapter(messages, userTo)
+        adapter = MessageAdapter(messages, userTo, emoticonLongClick = {view, position ->
+            reactEmoticonIcon(binding.messengerRecycler, binding.messengerRecycler.layoutManager as LinearLayoutManager, position, view)
+        })
 
         binding.messengerRecycler.adapter = adapter
 
@@ -264,6 +269,53 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         } else {
             getGalleryIntent.launch("video/*, image/*")
         }
+    }
+
+
+    private fun reactEmoticonIcon(recyclerView: RecyclerView, layoutManager: LinearLayoutManager, position: Int, rootView: View) {
+
+        val holder = recyclerView.findViewHolderForAdapterPosition(position)
+
+        if (holder is MessageAdapter.LeftHolder) {
+            val leftHolder: MessageAdapter.LeftHolder = holder
+
+            Log.e("reactEmoticonIcon", "x: ${leftHolder.view.x}")
+            Log.e("reactEmoticonIcon", "Y: ${leftHolder.view.y}")
+
+
+            val reactEmoticonView: View = LayoutInflater.from(requireContext()).inflate(R.layout.react_emoticon_popup, null)
+
+            val emoticonPopup = PopupWindow(
+                reactEmoticonView,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+            emoticonPopup.isOutsideTouchable = true
+            emoticonPopup.isFocusable = true
+            emoticonPopup.showAsDropDown(rootView, 0, leftHolder.view.y.toInt() + 48, Gravity.CENTER)
+
+            val reactionIds = intArrayOf(
+                com.bachnn.messenger.R.id.reaction_like,
+                com.bachnn.messenger.R.id.reaction_haha,
+                com.bachnn.messenger.R.id.reaction_p,
+                com.bachnn.messenger.R.id.reaction_sad,
+                com.bachnn.messenger.R.id.reaction_kiss
+            )
+
+
+            reactionIds.forEach { id ->
+                reactEmoticonView.findViewById<ImageView>(id).setOnClickListener {
+                    //todo animation.
+
+                    emoticonPopup.dismiss()
+                }
+            }
+
+
+        }
+
     }
 
 

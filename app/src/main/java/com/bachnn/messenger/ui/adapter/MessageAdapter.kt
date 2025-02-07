@@ -2,7 +2,9 @@ package com.bachnn.messenger.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnLongClickListener
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +15,7 @@ import com.bachnn.messenger.data.model.User
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
 
-class MessageAdapter(val messages: List<Message>, val user: User) :
+class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLongClick: (View, Int) -> Unit) :
     RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
     abstract class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
@@ -49,17 +51,19 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
     }
 
 
-    class LeftHolder(view: View,private val user: User) : ViewHolder(view) {
+    class LeftHolder(view: View,private val user: User, val emoticonLongClick: (View, Int) -> Unit) : ViewHolder(view) {
 
         private val circleImage : CircleImageView
         private val messageText: TextView
         private val messageImage: ImageView
+        val leftView: FrameLayout
 
 
         init {
             circleImage = view.findViewById(R.id.circle_image)
             messageText = view.findViewById(R.id.left_message_text)
             messageImage = view.findViewById(R.id.left_message_image)
+            leftView = view.findViewById(R.id.left_view)
         }
         override fun bind(message: Message) {
             Glide.with(view).load(user.photoUrl).into(circleImage)
@@ -93,7 +97,7 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
         } else {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.left_message_item, parent, false)
-            LeftHolder(view, user)
+            LeftHolder(view, user, emoticonLongClick)
         }
     }
 
@@ -103,6 +107,11 @@ class MessageAdapter(val messages: List<Message>, val user: User) :
         if (messages[position].idFrom == user.uid) {
             val leftHolder : LeftHolder = holder as LeftHolder
             leftHolder.bind(messages[position])
+            leftHolder.leftView.setOnLongClickListener {
+                emoticonLongClick(it.rootView, position)
+                true
+            }
+
         } else {
             val rightHolder : RightHolder = holder as RightHolder
             rightHolder.bind(messages[position])
