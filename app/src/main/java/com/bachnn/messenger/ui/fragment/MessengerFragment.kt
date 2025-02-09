@@ -1,7 +1,6 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
-import android.R
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -273,14 +272,18 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
 
     private fun reactEmoticonIcon(recyclerView: RecyclerView, layoutManager: LinearLayoutManager, position: Int, rootView: View) {
-
+        val popupHeight: Int = 56
         val holder = recyclerView.findViewHolderForAdapterPosition(position)
 
         if (holder is MessageAdapter.LeftHolder) {
             val leftHolder: MessageAdapter.LeftHolder = holder
+            var yPopupWindow: Int = 0
 
-            Log.e("reactEmoticonIcon", "x: ${leftHolder.view.x}")
-            Log.e("reactEmoticonIcon", "Y: ${leftHolder.view.y}")
+            if ((leftHolder.view.y.toInt() + recyclerView.y.toInt() - popupHeight) < recyclerView.y.toInt()) {
+                yPopupWindow = leftHolder.view.y.toInt() + recyclerView.y.toInt() + popupHeight + leftHolder.view.height + 8
+            } else {
+                yPopupWindow = leftHolder.view.y.toInt() + recyclerView.y.toInt() - popupHeight
+            }
 
 
             val reactEmoticonView: View = LayoutInflater.from(requireContext()).inflate(R.layout.react_emoticon_popup, null)
@@ -294,14 +297,14 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
             emoticonPopup.isOutsideTouchable = true
             emoticonPopup.isFocusable = true
-            emoticonPopup.showAsDropDown(rootView, 0, leftHolder.view.y.toInt() + 48, Gravity.CENTER)
+            emoticonPopup.showAsDropDown(rootView, 0, yPopupWindow, Gravity.CENTER)
 
             val reactionIds = intArrayOf(
-                com.bachnn.messenger.R.id.reaction_like,
-                com.bachnn.messenger.R.id.reaction_haha,
-                com.bachnn.messenger.R.id.reaction_p,
-                com.bachnn.messenger.R.id.reaction_sad,
-                com.bachnn.messenger.R.id.reaction_kiss
+                R.id.reaction_like,
+                R.id.reaction_haha,
+                R.id.reaction_p,
+                R.id.reaction_sad,
+                R.id.reaction_kiss
             )
 
 
