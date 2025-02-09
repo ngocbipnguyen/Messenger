@@ -1,51 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="56dp"
+    android:layout_height="64dp"
     android:background="@drawable/react_emoticon_background"
     android:orientation="horizontal"
-    android:gravity="center_horizontal"
-    android:padding="4dp">
+    android:gravity="center"
+    android:padding="8dp">
 
 
     <ImageView
         android:id="@+id/reaction_like"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:padding="4dp"
+        android:layout_margin="4dp"
         android:src="@drawable/like"
         android:layout_marginEnd="6dp"
+        android:layout_marginStart="8dp"
         />
 
     <ImageView
         android:id="@+id/reaction_kiss"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:padding="4dp"
+        android:layout_margin="4dp"
         android:src="@drawable/kiss"
         android:layout_marginEnd="6dp" />
 
     <ImageView
         android:id="@+id/reaction_haha"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:padding="4dp"
+        android:layout_margin="4dp"
         android:src="@drawable/haha"
         android:layout_marginEnd="6dp" />
 
     <ImageView
         android:id="@+id/reaction_p"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:padding="4dp"
+        android:layout_margin="4dp"
         android:src="@drawable/p"
         android:layout_marginEnd="6dp" />
 
     <ImageView
         android:id="@+id/reaction_sad"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:padding="4dp"
+        android:layout_margin="4dp"
+        android:layout_marginEnd="8dp"
         android:src="@drawable/sad" />
 
 

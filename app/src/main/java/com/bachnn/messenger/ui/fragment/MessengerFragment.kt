@@ -1,6 +1,9 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -272,7 +275,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
 
     private fun reactEmoticonIcon(recyclerView: RecyclerView, layoutManager: LinearLayoutManager, position: Int, rootView: View) {
-        val popupHeight: Int = 56
+        val popupHeight: Int = 64
         val holder = recyclerView.findViewHolderForAdapterPosition(position)
 
         if (holder is MessageAdapter.LeftHolder) {
@@ -311,8 +314,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             reactionIds.forEach { id ->
                 reactEmoticonView.findViewById<ImageView>(id).setOnClickListener {
                     //todo animation.
-
-                    emoticonPopup.dismiss()
+                    val image: ImageView = reactEmoticonView.findViewById(id)
+                    scaleEmoticonPopup(image, emoticonPopup)
                 }
             }
 
@@ -321,6 +324,59 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
     }
 
+
+    fun scaleEmoticonPopup(view : View, emoticon: PopupWindow) {
+        val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1f, 1.5f)
+        val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1f, 1.5f)
+
+        val animatorSet = AnimatorSet()
+
+        animatorSet.playTogether(scaleX, scaleY)
+
+        animatorSet.duration = 300
+
+        animatorSet.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                val scaleXEnd = ObjectAnimator.ofFloat(view, "scaleX", 1.5f, 1f)
+                val scaleYEnd = ObjectAnimator.ofFloat(view, "scaleY", 1.5f, 1f)
+                val animatorSetEnd = AnimatorSet()
+                animatorSetEnd.playTogether(scaleYEnd, scaleXEnd)
+                animatorSetEnd.duration = 200
+                animatorSetEnd.start()
+                animatorSetEnd.addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        emoticon.dismiss()
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {
+                    }
+
+                })
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+
+            }
+
+        })
+
+        animatorSet.start()
+
+    }
 
 
 }
