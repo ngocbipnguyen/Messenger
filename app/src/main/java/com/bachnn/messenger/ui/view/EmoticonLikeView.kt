@@ -31,7 +31,7 @@ class EmoticonLikeView constructor(
         this.setBackgroundColor(Color.TRANSPARENT)
     }
 
-    public fun configure(config: EmoticonConfig) {
+    fun configure(config: EmoticonConfig) {
         this.emoticonConfig = config
         emoticonCellViews = LinkedList()
         selectedEmoticon = -1
@@ -186,7 +186,7 @@ class EmoticonLikeView constructor(
 
 
     fun onTouchMove(x: Float, y: Float) {
-        val maxX : Int = width.toInt()
+        val maxX : Int = width
         val minX : Int = x.toInt()
 
         var index : Int = (((x-minX)/ maxX)* emoticonConfig.emojis?.size!!.toInt()).toInt()
@@ -200,7 +200,7 @@ class EmoticonLikeView constructor(
             if (index < 0) {
                 index =0
             }
-            if (index > emoticonConfig.emojis?.size!!) {
+            if (index > emoticonConfig.emojis?.size!!.minus(1)) {
                 index = emoticonConfig.emojis?.size!!
             }
             setSelectedLikeOnIndex(index)

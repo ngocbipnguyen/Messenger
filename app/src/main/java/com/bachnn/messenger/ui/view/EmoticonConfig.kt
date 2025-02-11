@@ -9,6 +9,20 @@ import android.view.animation.AnimationUtils
 import com.bachnn.messenger.R
 import java.util.LinkedList
 
+/*
+* xml:
+* <EmoticonLikeView
+* >
+*
+* kotlin
+* EmoticonConfig to config arg (EmoticonCellView)
+* create a ground view in ground view create number of cellView contain icon and text\
+*
+* handle touch and animation for cellView
+* pass MotionEvent from EmoticonLikeTouchDetector -> EmoticonTriggerManager -> groundView handle show groundView and
+*  calculate selectView and unselectView and scale Up and Down animation.
+*
+* */
 class EmoticonConfig(val context: Context) {
 
     //??
@@ -273,10 +287,10 @@ class EmoticonConfig(val context: Context) {
         else if (emojis!!.size <= 1)
             throw EmoticonException("Please add more emojis")
         else if (emoticonLikeView == null)
-            throw EmoticonException("EmojiLikeView not set. Use open method.")
+            throw EmoticonException("EmoticonLikeView not set. Use open method.")
         else {
-//            target.configureEmojiLike(this)
-//            emojiView.configure(this)
+            target.configureEmojiLike(this)
+            emoticonLikeView?.configure(this)
         }
     }
 
