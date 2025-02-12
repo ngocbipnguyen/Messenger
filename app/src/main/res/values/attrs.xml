@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="custom_emoticon_group">
+        <attr name="android:background" format="integer"/>
+        <attr name="emoticon_view_width" format="dimension"/>
+        <attr name="margin_start_end" format="dimension"/>
+        <attr name="margin_emoticon_view" format="dimension"/>
+
+        <attr name="selected_emoticon_view_width" format="dimension" />
+        <attr name="margin_selected_emoticon_view" format="dimension" />
+    </declare-styleable>
+</resources>

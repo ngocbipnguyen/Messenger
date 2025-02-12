@@ -298,9 +298,19 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 true
             )
 
+
+            Log.e("reactEmoticonIcon", "wh out :  ${reactEmoticonView.width}/${reactEmoticonView.height}")
+
             emoticonPopup.isOutsideTouchable = true
             emoticonPopup.isFocusable = true
             emoticonPopup.showAsDropDown(rootView, 0, yPopupWindow, Gravity.CENTER)
+
+
+            reactEmoticonView.viewTreeObserver.addOnGlobalLayoutListener {
+                val width = reactEmoticonView.width
+                val height = reactEmoticonView.height
+                Log.e("reactEmoticonIcon", "wh in :  $width/$height")
+            }
 
             val reactionIds = intArrayOf(
                 R.id.reaction_like,

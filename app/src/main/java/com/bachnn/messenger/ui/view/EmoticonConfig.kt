@@ -289,7 +289,7 @@ class EmoticonConfig(val context: Context) {
         else if (emoticonLikeView == null)
             throw EmoticonException("EmoticonLikeView not set. Use open method.")
         else {
-            target.configureEmojiLike(this)
+//            target.configureEmojiLike(this)
             emoticonLikeView?.configure(this)
         }
     }
