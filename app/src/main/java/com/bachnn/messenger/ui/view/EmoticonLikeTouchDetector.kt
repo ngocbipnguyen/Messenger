@@ -1,6 +1,7 @@
 package com.bachnn.messenger.ui.view
 
 import android.view.MotionEvent
+import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 import java.util.LinkedList
 
 class EmoticonLikeTouchDetector {
@@ -12,7 +13,7 @@ class EmoticonLikeTouchDetector {
         return emoticonTriggerManagers as MutableList<EmoticonTriggerManager>
     }
 
-    fun configure(emoticonConfig: EmoticonConfig) {
+    fun configure(emoticonConfig: InitEmoticonConfig) {
         val emoticonTriggerManager = EmoticonTriggerManager()
         emoticonTriggerManager.configure(emoticonConfig)
         getEmoticonTriggerManagers().add(emoticonTriggerManager)

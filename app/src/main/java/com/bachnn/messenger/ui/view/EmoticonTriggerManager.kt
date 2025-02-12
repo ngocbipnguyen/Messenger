@@ -3,12 +3,15 @@ package com.bachnn.messenger.ui.view
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
+import com.bachnn.messenger.ui.view.custom.EmoticonConstant
+import com.bachnn.messenger.ui.view.custom.EmoticonGroupView
+import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 
 class EmoticonTriggerManager {
 
     private var triggerView: View? = null
 
-    private var emoticonLikeView: EmoticonLikeView? = null
+    private var emoticonGroupView: EmoticonGroupView? = null
 
     private var touchDownDelay: Int = 0
 
@@ -24,11 +27,11 @@ class EmoticonTriggerManager {
 
     private var upEvent: MotionEvent? = null
 
-    fun configure(emoticonConfig: EmoticonConfig) {
+    fun configure(emoticonConfig: InitEmoticonConfig) {
         this.triggerView = emoticonConfig.triggerView
-        this.touchDownDelay = emoticonConfig.touchDownDelay
-        this.touchUpDelay = emoticonConfig.touchUpDelay
-        this.emoticonLikeView = emoticonConfig.emoticonLikeView
+        this.touchDownDelay = EmoticonConstant.TOUCH_DOWN_DELAY
+        this.touchUpDelay =  EmoticonConstant.TOUCH_UP_DELAY
+        this.emoticonGroupView = emoticonConfig.emoticonGroupView
     }
 
     private fun intersectView(view: View, rx: Int, ry: Int): Boolean {
@@ -61,8 +64,8 @@ class EmoticonTriggerManager {
                     if (triggerViewTouched) {
                         //if the user has touched and the touch is still down
                         shouldSendEventsToEmoticonView = true
-                        emoticonLikeView?.onTouchDown(downEvent!!.rawX, downEvent!!.rawY)
-                        emoticonLikeView?.show()
+                        emoticonGroupView?.onTouchDown(downEvent!!.rawX, downEvent!!.rawY)
+//                        emoticonGroupView?.show()
                     }
                 }, touchDownDelay.toLong())
 
@@ -73,7 +76,7 @@ class EmoticonTriggerManager {
 
             if (triggerViewTouched) {
                 if (shouldSendEventsToEmoticonView) {
-                    emoticonLikeView?.onTouchMove(x, y)
+                    emoticonGroupView?.onTouchMove(x, y)
                     return false
                 }
             }
@@ -87,8 +90,8 @@ class EmoticonTriggerManager {
 
             Handler().postDelayed({
                 shouldWaitForClosing = false
-                emoticonLikeView?.onTouchUp(x,y)
-                emoticonLikeView?.hide()
+                emoticonGroupView?.onTouchUp(x,y)
+//                emoticonGroupView?.hide()
             }, touchUpDelay.toLong())
 
             return false
@@ -97,8 +100,8 @@ class EmoticonTriggerManager {
         return true
     }
 
-    fun getEmoticonLikeView(): EmoticonLikeView {
-        return emoticonLikeView!!
+    fun getEmoticonLikeView(): EmoticonGroupView {
+        return emoticonGroupView!!
     }
 
 }

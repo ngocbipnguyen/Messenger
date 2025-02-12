@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -34,6 +35,11 @@ import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.MessengerFragmentBinding
 import com.bachnn.messenger.ui.adapter.MessageAdapter
+import com.bachnn.messenger.ui.view.Emoticon
+import com.bachnn.messenger.ui.view.EmoticonLikeTouchDetector
+import com.bachnn.messenger.ui.view.OnEmoticonSelectedListener
+import com.bachnn.messenger.ui.view.custom.EmoticonGroupView
+import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -56,6 +62,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     private lateinit var uriImage: Uri
     private lateinit var pathFile: File
     private lateinit var dateCamera: Date
+
+    private lateinit var emoticonLikeTouchDetector: EmoticonLikeTouchDetector
 
 
     // Register ActivityResult handler
@@ -124,6 +132,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     override fun initView() {
         userTo = MessengerFragmentArgs.fromBundle(requireArguments()).userArg!!
 
+        emoticonLikeTouchDetector = EmoticonLikeTouchDetector()
         setFragmentResultListener(Constants.REQUEST_MEDIA) { _, bundle ->
             val uri = bundle.getString(Constants.MEDIA_URI)
             if (uri != null) {
@@ -289,7 +298,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             }
 
 
-            val reactEmoticonView: View = LayoutInflater.from(requireContext()).inflate(R.layout.react_emoticon_popup, null)
+            val reactEmoticonView: View = LayoutInflater.from(requireContext()).inflate(R.layout.emoticon_popup, null)
 
             val emoticonPopup = PopupWindow(
                 reactEmoticonView,
@@ -306,28 +315,52 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             emoticonPopup.showAsDropDown(rootView, 0, yPopupWindow, Gravity.CENTER)
 
 
-            reactEmoticonView.viewTreeObserver.addOnGlobalLayoutListener {
-                val width = reactEmoticonView.width
-                val height = reactEmoticonView.height
-                Log.e("reactEmoticonIcon", "wh in :  $width/$height")
-            }
+            val emoticonGroupView: EmoticonGroupView = reactEmoticonView.findViewById(R.id.emotion_view)
 
-            val reactionIds = intArrayOf(
-                R.id.reaction_like,
-                R.id.reaction_haha,
-                R.id.reaction_p,
-                R.id.reaction_sad,
-                R.id.reaction_kiss
-            )
+            val initEmoticonConfig: InitEmoticonConfig = InitEmoticonConfig.with(requireContext())
+            initEmoticonConfig.on(leftHolder.view)
+                .open(emoticonGroupView)
+                .addEmoticon(Emoticon(R.id.reaction_like, "Like"))
+                .addEmoticon(Emoticon(R.id.reaction_haha, "Haha"))
+                .addEmoticon(Emoticon(R.id.reaction_p, "Like"))
+                .addEmoticon(Emoticon(R.id.reaction_sad, "Like"))
+                .addEmoticon(Emoticon(R.id.reaction_kiss, "Like"))
+                .setOnEmojiSelectedListener(object : OnEmoticonSelectedListener{
+                    override fun onEmoticonSelected(emoticon: Emoticon) {
+                        Log.e("onEmoticonSelected", emoticon.description)
+                    }
+                }).setup()
 
+            emoticonLikeTouchDetector.configure(initEmoticonConfig)
 
-            reactionIds.forEach { id ->
-                reactEmoticonView.findViewById<ImageView>(id).setOnClickListener {
-                    //todo animation.
-                    val image: ImageView = reactEmoticonView.findViewById(id)
-                    scaleEmoticonPopup(image, emoticonPopup)
-                }
-            }
+            reactEmoticonView.setOnTouchListener(View.OnTouchListener { _, event ->
+                emoticonLikeTouchDetector.dispatchTouchEvent(event)
+                true
+            })
+
+//
+//            reactEmoticonView.viewTreeObserver.addOnGlobalLayoutListener {
+//                val width = reactEmoticonView.width
+//                val height = reactEmoticonView.height
+//                Log.e("reactEmoticonIcon", "wh in :  $width/$height")
+//            }
+//
+//            val reactionIds = intArrayOf(
+//                R.id.reaction_like,
+//                R.id.reaction_haha,
+//                R.id.reaction_p,
+//                R.id.reaction_sad,
+//                R.id.reaction_kiss
+//            )
+//
+//
+//            reactionIds.forEach { id ->
+//                reactEmoticonView.findViewById<ImageView>(id).setOnClickListener {
+//                    //todo animation.
+//                    val image: ImageView = reactEmoticonView.findViewById(id)
+//                    scaleEmoticonPopup(image, emoticonPopup)
+//                }
+//            }
 
 
         }
