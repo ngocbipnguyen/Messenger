@@ -320,11 +320,11 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             val initEmoticonConfig: InitEmoticonConfig = InitEmoticonConfig.with(requireContext())
             initEmoticonConfig.on(leftHolder.view)
                 .open(emoticonGroupView)
-                .addEmoticon(Emoticon(R.id.reaction_like, "Like"))
-                .addEmoticon(Emoticon(R.id.reaction_haha, "Haha"))
-                .addEmoticon(Emoticon(R.id.reaction_p, "Like"))
-                .addEmoticon(Emoticon(R.id.reaction_sad, "Like"))
-                .addEmoticon(Emoticon(R.id.reaction_kiss, "Like"))
+                .addEmoticon(Emoticon(R.drawable.like, "Like"))
+                .addEmoticon(Emoticon(R.drawable.haha, "Haha"))
+                .addEmoticon(Emoticon(R.drawable.p, "p"))
+                .addEmoticon(Emoticon(R.drawable.sad, "sad"))
+                .addEmoticon(Emoticon(R.drawable.kiss, "kiss"))
                 .setOnEmojiSelectedListener(object : OnEmoticonSelectedListener{
                     override fun onEmoticonSelected(emoticon: Emoticon) {
                         Log.e("onEmoticonSelected", emoticon.description)
@@ -339,12 +339,12 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             })
 
 //
-//            reactEmoticonView.viewTreeObserver.addOnGlobalLayoutListener {
-//                val width = reactEmoticonView.width
-//                val height = reactEmoticonView.height
-//                Log.e("reactEmoticonIcon", "wh in :  $width/$height")
-//            }
-//
+            reactEmoticonView.viewTreeObserver.addOnGlobalLayoutListener {
+                val width = reactEmoticonView.width
+                val height = reactEmoticonView.height
+                Log.e("reactEmoticonIcon", "wh in :  $width/$height")
+            }
+
 //            val reactionIds = intArrayOf(
 //                R.id.reaction_like,
 //                R.id.reaction_haha,

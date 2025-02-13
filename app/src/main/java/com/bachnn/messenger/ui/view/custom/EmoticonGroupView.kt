@@ -7,19 +7,16 @@ import android.view.View
 import android.view.animation.Animation
 import android.widget.LinearLayout
 import com.bachnn.messenger.R
-import com.bachnn.messenger.ui.view.EmoticonCellView
-import com.bachnn.messenger.ui.view.EmoticonConfig
-import com.bachnn.messenger.ui.view.ViewWeightAnimation
 import java.util.LinkedList
 
-class EmoticonGroupView(
+class EmoticonGroupView @JvmOverloads constructor(
     private val context: Context,
     attr: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attr, defStyleAttr) {
 
 
-    var backgroundGroupView: Int
+//    var backgroundGroupView: Int
     var emoticonViewWidth: Int
     var marginStartEnd: Int
     var marginEmotionView: Int
@@ -41,10 +38,10 @@ class EmoticonGroupView(
     init {
         attr.let {
             val typedArray = context.obtainStyledAttributes(it, R.styleable.custom_emoticon_group)
-            backgroundGroupView = typedArray.getInt(
-                R.styleable.custom_emoticon_group_android_background,
-                R.drawable.react_emoticon_background
-            )
+//            backgroundGroupView = typedArray.getInt(
+//                R.styleable.custom_emoticon_group_android_background,
+//                R.drawable.react_emoticon_background
+//            )
             emoticonViewWidth = dpToXp(
                 typedArray.getDimension(
                     R.styleable.custom_emoticon_group_margin_emoticon_view,
@@ -78,6 +75,10 @@ class EmoticonGroupView(
                 )
             )
         }
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
     }
 
 
