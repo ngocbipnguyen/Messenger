@@ -55,7 +55,7 @@ class EmoticonTriggerManager {
 
         if (action == MotionEvent.ACTION_DOWN) {
 
-            if (intersectView(triggerView!!, x.toInt(), y.toInt())) {
+//            if (intersectView(triggerView!!, x.toInt(), y.toInt())) {
                 triggerViewTouched = true
                 shouldSendEventsToEmoticonView = false
                 downEvent = event
@@ -70,7 +70,7 @@ class EmoticonTriggerManager {
                 }, touchDownDelay.toLong())
 
                 return false
-            }
+//            }
 
         } else if (action == MotionEvent.ACTION_MOVE) {
 

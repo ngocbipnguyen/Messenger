@@ -6,26 +6,19 @@ import java.util.LinkedList
 
 class EmoticonLikeTouchDetector {
 
-    private var emoticonTriggerManagers: MutableList<EmoticonTriggerManager>? = null
-
-    private fun getEmoticonTriggerManagers(): MutableList<EmoticonTriggerManager> {
-        if (emoticonTriggerManagers == null) emoticonTriggerManagers = LinkedList()
-        return emoticonTriggerManagers as MutableList<EmoticonTriggerManager>
-    }
+    private var emoticonTriggerManagers: EmoticonTriggerManager? = null
 
     fun configure(emoticonConfig: InitEmoticonConfig) {
         val emoticonTriggerManager = EmoticonTriggerManager()
         emoticonTriggerManager.configure(emoticonConfig)
-        getEmoticonTriggerManagers().add(emoticonTriggerManager)
+        emoticonTriggerManagers = emoticonTriggerManager
     }
 
     fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        getEmoticonTriggerManagers().forEach { it ->
-            if (it.getEmoticonLikeView().isShown || event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_UP) {
-                val shouldCallSuper = it.onTouch(event)
-                if (!shouldCallSuper && event.action == MotionEvent.ACTION_MOVE) {
-                    return false
-                }
+        if (emoticonTriggerManagers?.getEmoticonLikeView()?.isShown!! || event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_UP) {
+            val shouldCallSuper = emoticonTriggerManagers?.onTouch(event)
+            if (!shouldCallSuper!! && event.action == MotionEvent.ACTION_MOVE) {
+                return false
             }
         }
 

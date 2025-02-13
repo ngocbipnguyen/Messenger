@@ -25,7 +25,7 @@ data class EmoticonWeightAnimation(
             val height =
                 if (shouldSelect) emoticonGroupView.selectedEmoticonViewWidth else emoticonGroupView.emoticonViewWidth
             val weight = currentWeight
-            val params = LinearLayout.LayoutParams(0, height, weight)
+            val params = LinearLayout.LayoutParams(0, height, weight) //todo.
             val marginView: Int =
                 if (shouldSelect) emoticonGroupView.marginSelectedEmoticonView else emoticonGroupView.marginEmotionView
             when (index) {

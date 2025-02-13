@@ -328,12 +328,15 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 .setOnEmojiSelectedListener(object : OnEmoticonSelectedListener{
                     override fun onEmoticonSelected(emoticon: Emoticon) {
                         Log.e("onEmoticonSelected", emoticon.description)
+                        emoticonPopup.dismiss()
+
                     }
                 }).setup()
 
             emoticonLikeTouchDetector.configure(initEmoticonConfig)
 
             reactEmoticonView.setOnTouchListener(View.OnTouchListener { _, event ->
+                Log.e("reactEmoticonIcon", "raw :${event.rawX}/${event.rawY}")
                 emoticonLikeTouchDetector.dispatchTouchEvent(event)
                 true
             })
@@ -345,81 +348,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 Log.e("reactEmoticonIcon", "wh in :  $width/$height")
             }
 
-//            val reactionIds = intArrayOf(
-//                R.id.reaction_like,
-//                R.id.reaction_haha,
-//                R.id.reaction_p,
-//                R.id.reaction_sad,
-//                R.id.reaction_kiss
-//            )
-//
-//
-//            reactionIds.forEach { id ->
-//                reactEmoticonView.findViewById<ImageView>(id).setOnClickListener {
-//                    //todo animation.
-//                    val image: ImageView = reactEmoticonView.findViewById(id)
-//                    scaleEmoticonPopup(image, emoticonPopup)
-//                }
-//            }
-
-
         }
 
     }
-
-
-    fun scaleEmoticonPopup(view : View, emoticon: PopupWindow) {
-        val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1f, 1.5f)
-        val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1f, 1.5f)
-
-        val animatorSet = AnimatorSet()
-
-        animatorSet.playTogether(scaleX, scaleY)
-
-        animatorSet.duration = 300
-
-        animatorSet.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) {
-
-            }
-
-            override fun onAnimationEnd(animation: Animator) {
-                val scaleXEnd = ObjectAnimator.ofFloat(view, "scaleX", 1.5f, 1f)
-                val scaleYEnd = ObjectAnimator.ofFloat(view, "scaleY", 1.5f, 1f)
-                val animatorSetEnd = AnimatorSet()
-                animatorSetEnd.playTogether(scaleYEnd, scaleXEnd)
-                animatorSetEnd.duration = 200
-                animatorSetEnd.start()
-                animatorSetEnd.addListener(object : Animator.AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {
-                    }
-
-                    override fun onAnimationEnd(animation: Animator) {
-                        emoticon.dismiss()
-                    }
-
-                    override fun onAnimationCancel(animation: Animator) {
-                    }
-
-                    override fun onAnimationRepeat(animation: Animator) {
-                    }
-
-                })
-            }
-
-            override fun onAnimationCancel(animation: Animator) {
-
-            }
-
-            override fun onAnimationRepeat(animation: Animator) {
-
-            }
-
-        })
-
-        animatorSet.start()
-
-    }
-
 
 }

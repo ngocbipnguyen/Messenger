@@ -1,10 +1,12 @@
 package com.bachnn.messenger.ui.view.custom
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.Animation
 import android.widget.LinearLayout
 import com.bachnn.messenger.R
 import java.util.LinkedList
@@ -30,10 +32,11 @@ class EmoticonGroupView @JvmOverloads constructor(
     private lateinit var emotionViews: MutableList<EmotionView>
 
     private var selectedEmotion: Int = -1
+    private var previousSelectedEmotion = -1
 
     private var emoticonConfig: InitEmoticonConfig? = null
 
-//    private lateinit var emoticonConfig: EmoticonConfig
+    private var endTouch: Int = -1
 
     init {
         attr.let {
@@ -95,6 +98,8 @@ class EmoticonGroupView @JvmOverloads constructor(
             val emotionView = EmotionView(context)
             emotionView.layoutParams = getDefaultLayoutParams(index)
             emotionView.setEmoticon(emotion)
+            val padding = dpToXp(4f)
+            emotionView.setPadding(padding,padding,padding,padding)
             this.addView(emotionView)
             this.emotionViews.add(emotionView)
         }
@@ -123,8 +128,8 @@ class EmoticonGroupView @JvmOverloads constructor(
                 params.setMargins(
                     marginEmotionView,
                     marginEmotionView,
-                    marginEmotionView,
-                    marginEmotionView + marginStartEnd
+                    marginEmotionView + marginStartEnd,
+                    marginEmotionView
                 )
             }
 
@@ -150,11 +155,13 @@ class EmoticonGroupView @JvmOverloads constructor(
                 if (selectedEmotion >= 0 && selectedEmotion < this.emotionViews.size) {
                     if (x.toInt() != -1 && y.toInt() != -1) {
                         if (selectedEmotion != -1) {
+                            setUnselectedEmoticon(selectedEmotion)
                             emoticonConfig?.onEmoticonSelectedListener!!.onEmoticonSelected(
                                 this.emoticonConfig?.emoticons?.get(
                                     selectedEmotion
                                 )!!
                             )
+                            selectedEmotion = -1
                         }
                     }
                 }
@@ -166,13 +173,13 @@ class EmoticonGroupView @JvmOverloads constructor(
         val maxX: Int = width
         val minX: Int = x.toInt()
 
-        var index: Int = (((x - minX) / maxX) * emoticonConfig?.emoticons?.size!!.toInt()).toInt()
+        var index: Int = ((x / maxX.toFloat()) * emoticonConfig?.emoticons?.size!!).toInt()
 
-        if (x < minX || x > maxX + minX) {
-            emoticonConfig?.emoticons?.forEachIndexed { index, emoticon ->
-                setUnselectedEmoticon(index)
-            }
-            selectedEmotion = -1
+        if (x < 0 || x > maxX) {
+//            emoticonConfig?.emoticons?.forEachIndexed { index, emoticon ->
+//                setUnselectedEmoticon(index)
+//            }
+//            selectedEmotion = -1
         } else {
             if (index < 0) {
                 index = 0
@@ -180,7 +187,11 @@ class EmoticonGroupView @JvmOverloads constructor(
             if (index > emoticonConfig?.emoticons?.size!!.minus(1)) {
                 index = emoticonConfig?.emoticons?.size!!
             }
-            setSelectedLikeOnIndex(index)
+
+            if (index != selectedEmotion) {
+                previousSelectedEmotion = selectedEmotion
+                setSelectedLikeOnIndex(index)
+            }
         }
     }
 
@@ -194,11 +205,9 @@ class EmoticonGroupView @JvmOverloads constructor(
     }
 
     private fun setSelectedLikeOnIndex(selectedIndex: Int) {
-        for (i in 0 until selectedIndex)
-            setUnselectedEmoticon(i)
-        for (i in selectedIndex + 1 until emoticonConfig?.emoticons?.size!!)
-            setUnselectedEmoticon(i)
-
+        if (previousSelectedEmotion != -1) {
+            setUnselectedEmoticon(previousSelectedEmotion)
+        }
         setSelectedEmoticon(selectedIndex)
 
     }
@@ -207,38 +216,88 @@ class EmoticonGroupView @JvmOverloads constructor(
         if (index >= 0 && index < emotionViews.size) {
             selectedEmotion = index
             val view: EmotionView = emotionViews[selectedEmotion]
-            val weight = getWeight(view)
-            growView(view, index, weight, EmoticonConstant.SELECTED_WEIGHT, emoticonConfig?.emojiAnimationSpeed!!, true)
+            runAnimation(view, true)
         }
     }
 
     private fun setUnselectedEmoticon(index: Int) {
         if (index >= 0 && index < emotionViews.size) {
             val view: EmotionView = emotionViews[index]
-            val weight = getWeight(view)
-            growView(view, index, weight, EmoticonConstant.UNSELECTED_WEIGHT, -emoticonConfig?.emojiAnimationSpeed!!, false)
+            runAnimation(view, false)
         }
     }
 
-    private fun getWeight(view: View): Float {
-        val param: LinearLayout.LayoutParams = view.layoutParams as LinearLayout.LayoutParams
-        return param.weight
-    }
 
-    private fun growView(
+    private fun runAnimation(
         view: EmotionView,
-        index: Int,
-        initWeight: Float,
-        maxWeight: Float,
-        step: Float,
         shouldSelect: Boolean
     ) {
-        val a: Animation =
-            EmoticonWeightAnimation(
-                view, index, initWeight, maxWeight, step, shouldSelect,
-                emoticonConfig?.emoticons?.size!!, this
-            )
-        view.startAnimation(a)
+        if(shouldSelect) {
+            scaleUpEmoticon(view)
+        } else {
+            scaleDownEmoticon(view)
+        }
+    }
+
+
+    fun scaleUpEmoticon(view : View) {
+        val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1f, 1.5f)
+        val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1f, 1.5f)
+
+        val animatorSet = AnimatorSet()
+
+        animatorSet.playTogether(scaleX, scaleY)
+
+        animatorSet.duration = 200
+
+        animatorSet.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+
+            }
+
+        })
+
+        animatorSet.start()
+    }
+
+    fun scaleDownEmoticon(view : View) {
+        val scaleXEnd = ObjectAnimator.ofFloat(view, "scaleX", 1.5f, 1f)
+        val scaleYEnd = ObjectAnimator.ofFloat(view, "scaleY", 1.5f, 1f)
+        val animatorSetEnd = AnimatorSet()
+        animatorSetEnd.playTogether(scaleYEnd, scaleXEnd)
+        animatorSetEnd.duration = 150
+        animatorSetEnd.start()
+        animatorSetEnd.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                if (endTouch == 0) {
+
+                } else if (endTouch == 1) {
+
+                }
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+            }
+
+        })
     }
 
     //todo animation scale up and down.
