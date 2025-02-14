@@ -6,8 +6,10 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import com.bachnn.messenger.R
 import java.util.LinkedList
 
@@ -155,14 +157,20 @@ class EmoticonGroupView @JvmOverloads constructor(
                 if (selectedEmotion >= 0 && selectedEmotion < this.emotionViews.size) {
                     if (x.toInt() != -1 && y.toInt() != -1) {
                         if (selectedEmotion != -1) {
-                            setUnselectedEmoticon(selectedEmotion)
-                            emoticonConfig?.onEmoticonSelectedListener!!.onEmoticonSelected(
-                                this.emoticonConfig?.emoticons?.get(
-                                    selectedEmotion
-                                )!!
-                            )
-                            selectedEmotion = -1
+                            setUnselectedEmoticon(selectedEmotion, true)
                         }
+                    }
+                } else {
+                    val maxX: Int = width
+                    val minX: Int = x.toInt()
+
+                    var index: Int = ((x / maxX.toFloat()) * emoticonConfig?.emoticons?.size!!).toInt()
+                    Log.e("onTouchUp", "index: $index")
+                    setSelectedEmoticon(index)
+                    if (index >= 0 && index < emotionViews.size) {
+                        val view: EmotionView = emotionViews[index]
+                        scaleEmoticonPopup(view)
+
                     }
                 }
             }
@@ -206,7 +214,7 @@ class EmoticonGroupView @JvmOverloads constructor(
 
     private fun setSelectedLikeOnIndex(selectedIndex: Int) {
         if (previousSelectedEmotion != -1) {
-            setUnselectedEmoticon(previousSelectedEmotion)
+            setUnselectedEmoticon(previousSelectedEmotion, false)
         }
         setSelectedEmoticon(selectedIndex)
 
@@ -216,26 +224,27 @@ class EmoticonGroupView @JvmOverloads constructor(
         if (index >= 0 && index < emotionViews.size) {
             selectedEmotion = index
             val view: EmotionView = emotionViews[selectedEmotion]
-            runAnimation(view, true)
+            runAnimation(view, true, false)
         }
     }
 
-    private fun setUnselectedEmoticon(index: Int) {
+    private fun setUnselectedEmoticon(index: Int,isUpEvent: Boolean) {
         if (index >= 0 && index < emotionViews.size) {
             val view: EmotionView = emotionViews[index]
-            runAnimation(view, false)
+            runAnimation(view, false, isUpEvent)
         }
     }
 
 
     private fun runAnimation(
         view: EmotionView,
-        shouldSelect: Boolean
+        shouldSelect: Boolean,
+        isUpEvent: Boolean
     ) {
         if(shouldSelect) {
             scaleUpEmoticon(view)
         } else {
-            scaleDownEmoticon(view)
+            scaleDownEmoticon(view, isUpEvent)
         }
     }
 
@@ -272,7 +281,7 @@ class EmoticonGroupView @JvmOverloads constructor(
         animatorSet.start()
     }
 
-    fun scaleDownEmoticon(view : View) {
+    fun scaleDownEmoticon(view : View, isUpEvent: Boolean) {
         val scaleXEnd = ObjectAnimator.ofFloat(view, "scaleX", 1.5f, 1f)
         val scaleYEnd = ObjectAnimator.ofFloat(view, "scaleY", 1.5f, 1f)
         val animatorSetEnd = AnimatorSet()
@@ -284,10 +293,13 @@ class EmoticonGroupView @JvmOverloads constructor(
             }
 
             override fun onAnimationEnd(animation: Animator) {
-                if (endTouch == 0) {
-
-                } else if (endTouch == 1) {
-
+                if(isUpEvent) {
+                    emoticonConfig?.onEmoticonSelectedListener!!.onEmoticonSelected(
+                        emoticonConfig?.emoticons?.get(
+                            selectedEmotion
+                        )!!
+                    )
+                    selectedEmotion = -1
                 }
             }
 
@@ -301,5 +313,63 @@ class EmoticonGroupView @JvmOverloads constructor(
     }
 
     //todo animation scale up and down.
+
+    fun scaleEmoticonPopup(view : View) {
+        val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1f, 1.5f)
+        val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1f, 1.5f)
+
+        val animatorSet = AnimatorSet()
+
+        animatorSet.playTogether(scaleX, scaleY)
+
+        animatorSet.duration = 300
+
+        animatorSet.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                val scaleXEnd = ObjectAnimator.ofFloat(view, "scaleX", 1.5f, 1f)
+                val scaleYEnd = ObjectAnimator.ofFloat(view, "scaleY", 1.5f, 1f)
+                val animatorSetEnd = AnimatorSet()
+                animatorSetEnd.playTogether(scaleYEnd, scaleXEnd)
+                animatorSetEnd.duration = 200
+                animatorSetEnd.start()
+                animatorSetEnd.addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        emoticonConfig?.onEmoticonSelectedListener!!.onEmoticonSelected(
+                            emoticonConfig?.emoticons?.get(
+                                selectedEmotion
+                            )!!
+                        )
+                        selectedEmotion = -1
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {
+                    }
+
+                })
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+
+            }
+
+        })
+
+        animatorSet.start()
+
+    }
 
 }
