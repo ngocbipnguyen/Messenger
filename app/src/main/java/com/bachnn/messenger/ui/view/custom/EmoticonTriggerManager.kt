@@ -1,11 +1,8 @@
-package com.bachnn.messenger.ui.view
+package com.bachnn.messenger.ui.view.custom
 
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
-import com.bachnn.messenger.ui.view.custom.EmoticonConstant
-import com.bachnn.messenger.ui.view.custom.EmoticonGroupView
-import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 
 class EmoticonTriggerManager {
 

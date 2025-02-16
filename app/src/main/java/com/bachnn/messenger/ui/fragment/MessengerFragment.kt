@@ -1,9 +1,6 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -11,10 +8,8 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,9 +30,9 @@ import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.MessengerFragmentBinding
 import com.bachnn.messenger.ui.adapter.MessageAdapter
-import com.bachnn.messenger.ui.view.Emoticon
-import com.bachnn.messenger.ui.view.EmoticonLikeTouchDetector
-import com.bachnn.messenger.ui.view.OnEmoticonSelectedListener
+import com.bachnn.messenger.ui.view.custom.Emoticon
+import com.bachnn.messenger.ui.view.custom.EmoticonLikeTouchDetector
+import com.bachnn.messenger.ui.view.custom.OnEmoticonSelectedListener
 import com.bachnn.messenger.ui.view.custom.EmoticonGroupView
 import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
@@ -326,7 +321,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 .addEmoticon(Emoticon(R.drawable.p, "p"))
                 .addEmoticon(Emoticon(R.drawable.sad, "sad"))
                 .addEmoticon(Emoticon(R.drawable.kiss, "kiss"))
-                .setOnEmojiSelectedListener(object : OnEmoticonSelectedListener{
+                .setOnEmojiSelectedListener(object : OnEmoticonSelectedListener {
                     override fun onEmoticonSelected(emoticon: Emoticon) {
                         Log.e("onEmoticonSelected", emoticon.description)
                         //todo update message.

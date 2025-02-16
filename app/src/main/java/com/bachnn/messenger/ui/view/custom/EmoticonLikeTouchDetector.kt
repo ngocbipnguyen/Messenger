@@ -1,8 +1,6 @@
-package com.bachnn.messenger.ui.view
+package com.bachnn.messenger.ui.view.custom
 
 import android.view.MotionEvent
-import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
-import java.util.LinkedList
 
 class EmoticonLikeTouchDetector {
 

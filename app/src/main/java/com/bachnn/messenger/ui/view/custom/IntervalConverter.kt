@@ -1,4 +1,4 @@
-package com.bachnn.messenger.ui.view
+package com.bachnn.messenger.ui.view.custom
 
 class IntervalConverter private constructor(private val x: Float) {
     private var a = 0f

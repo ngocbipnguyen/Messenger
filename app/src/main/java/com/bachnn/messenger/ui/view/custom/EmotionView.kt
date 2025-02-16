@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.bachnn.messenger.R
-import com.bachnn.messenger.ui.view.Emoticon
 
 
 /*

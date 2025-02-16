@@ -5,13 +5,6 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.bachnn.messenger.R
-import com.bachnn.messenger.ui.view.Emoticon
-import com.bachnn.messenger.ui.view.EmoticonCellView
-import com.bachnn.messenger.ui.view.EmoticonConfig
-import com.bachnn.messenger.ui.view.EmoticonException
-import com.bachnn.messenger.ui.view.EmoticonLikeView
-import com.bachnn.messenger.ui.view.IEmoticonCellViewFactory
-import com.bachnn.messenger.ui.view.OnEmoticonSelectedListener
 import java.util.LinkedList
 
 class InitEmoticonConfig(val context: Context) {
@@ -30,7 +23,7 @@ class InitEmoticonConfig(val context: Context) {
 
     var emojiAnimationSpeed: Float = 0f
 
-    var cellViewFactory: IEmoticonCellViewFactory? = null
+//    var cellViewFactory: IEmoticonCellViewFactory? = null
 
     init {
 
@@ -39,7 +32,7 @@ class InitEmoticonConfig(val context: Context) {
         emoticonViewClosedAnimation =
             AnimationUtils.loadAnimation(context, R.anim.emoticon_default_out_animation)
         emojiAnimationSpeed = 0.2f
-        cellViewFactory = IEmoticonCellViewFactory { context -> EmoticonCellView(context) }
+//        cellViewFactory = IEmoticonCellViewFactory { context -> EmoticonCellView(context) }
 
     }
 
@@ -78,10 +71,6 @@ class InitEmoticonConfig(val context: Context) {
     }
 
 
-    fun setEmojiCellViewFactory(factory: IEmoticonCellViewFactory?): InitEmoticonConfig {
-        this.cellViewFactory = factory
-        return this
-    }
 
     fun open(emoticonLikeView: EmoticonGroupView): InitEmoticonConfig {
         this.emoticonGroupView = emoticonLikeView

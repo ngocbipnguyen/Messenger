@@ -3,7 +3,6 @@ package com.bachnn.messenger.ui.view.custom
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.LinearLayout
-import com.bachnn.messenger.ui.view.IntervalConverter
 
 data class EmoticonWeightAnimation(
     val view: EmotionView, val index: Int,
