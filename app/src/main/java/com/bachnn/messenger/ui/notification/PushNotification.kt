@@ -51,7 +51,7 @@ class PushNotification {
         }
 
 
-        fun showNotification(context: Context, name: String, message: String, user: User) {
+        fun showNotification(context: Context, name: String, message: String, user: User, idNotification: Int) {
 
 //            val bundle = Bundle()
 //            bundle.putSerializable("user_notification",user)
@@ -97,7 +97,7 @@ class PushNotification {
                     return@with
                 }
                 // notificationId is a unique int for each notification that you must define.
-                notify(Constants.NOTIFICATION_ID, builder.build())
+                notify(idNotification, builder.build())
             }
         }
 

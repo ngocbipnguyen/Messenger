@@ -6,4 +6,5 @@ data class Message(
     val timestamp: String,
     val content: String,
     val type: String,
+    var emoticonType: String
 )

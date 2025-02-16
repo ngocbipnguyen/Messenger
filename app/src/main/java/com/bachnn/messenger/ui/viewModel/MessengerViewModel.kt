@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.bachnn.messenger.base.BaseViewModel
+import com.bachnn.messenger.constants.Constants
 import com.bachnn.messenger.constants.FirebaseConstants
 import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
@@ -104,7 +105,8 @@ class MessengerViewModel @Inject constructor(
                             doc.data?.get("idTo").toString(),
                             doc.data?.get("timestamp").toString(),
                             doc.data?.get("content").toString(),
-                            doc.data?.get("type").toString()
+                            doc.data?.get("type").toString(),
+                            doc.data?.get("emoticon_type").toString(),
                         )
                         listMessages.add(message)
                     }
@@ -132,7 +134,7 @@ class MessengerViewModel @Inject constructor(
                 // todo push notification..
                 _isVisibilitySending.postValue(false)
 
-                pushMessageNotification(content, auth.currentUser!!.displayName!!,token)
+                pushMessageNotification(content, auth.currentUser!!.displayName!!,token, Constants.EMOTICON_EMPTY)
             }
 
     }
@@ -155,7 +157,8 @@ class MessengerViewModel @Inject constructor(
                                 doc.data?.get("idTo").toString(),
                                 doc.data?.get("timestamp").toString(),
                                 doc.data?.get("content").toString(),
-                                doc.data?.get("type").toString()
+                                doc.data?.get("type").toString(),
+                                doc.data?.get("emoticon_type").toString(),
                             )
                             updateMessages.add(message)
                             _messages.postValue(updateMessages)
@@ -166,10 +169,10 @@ class MessengerViewModel @Inject constructor(
     }
 
 
-    private fun pushMessageNotification(content: String, title: String, token: String) {
+    private fun pushMessageNotification(content: String, title: String, token: String, emoticon: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val client = OkHttpClient()
-            val json = JSONObject(convertToJson(content, title, token)).toString()
+            val json = JSONObject(convertToJson(content, title, token,emoticon)).toString()
 
             val serverKey = PushNotification.getAccessToken(context)
 
@@ -186,7 +189,7 @@ class MessengerViewModel @Inject constructor(
     }
 
 
-    private fun convertToJson(content: String, title: String, token: String): Map<String, Any> {
+    private fun convertToJson(content: String, title: String, token: String, emoticon: String): Map<String, Any> {
         return mapOf(
             "message" to mapOf(
                 "token" to token,
@@ -205,10 +208,24 @@ class MessengerViewModel @Inject constructor(
                     "uid" to auth.currentUser?.uid,
                     "displayName" to auth.currentUser?.displayName,
                     "photoUrl" to auth.currentUser?.photoUrl,
-                    "currentToken" to currentToken
+                    "currentToken" to currentToken,
+                    "emoticon_type" to emoticon
                 )
             )
         )
+    }
+
+
+    fun updateEmoticonType(content: String, timestamps: String, type: String, token: String) {
+        val mapUser: MutableMap<String, Any> = HashMap()
+        mapUser[FirebaseConstants.EMOTICON_TYPE] = type
+
+        fireStore.collection(FirebaseConstants.pathMessages).document(group).collection(group)
+            .document(timestamps)
+            .update(mapUser).addOnCompleteListener {
+                // todo push notification..
+                pushMessageNotification(content, auth.currentUser!!.displayName!!, token, type)
+            }
     }
 
 

@@ -1,5 +1,6 @@
 package com.bachnn.messenger.ui.service
 
+import com.bachnn.messenger.constants.Constants
 import com.bachnn.messenger.constants.FirebaseConstants
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.ui.notification.PushNotification
@@ -34,11 +35,17 @@ class MessageService : FirebaseMessagingService() {
         val displayName = message.data["displayName"].toString()
         val currentToken = message.data["currentToken"].toString()
         val photoUrl = message.data["photoUrl"].toString()
+        val emoticonType: Int = message.data["emoticon_type"].toString().toInt()
         val user = User(uid,displayName,"",photoUrl,"", currentToken)
 
+        val idNotification = if (emoticonType > 0) {
+            Constants.NOTIFICATION_ID
+        } else {
+            Constants.NOTIFICATION_EMOTICON_ID
+        }
 
 
-        PushNotification.showNotification(baseContext,  message.notification?.title!!,message.notification?.body!!, user )
+        PushNotification.showNotification(baseContext,  message.notification?.title!!,message.notification?.body!!, user, idNotification)
 
 
     }

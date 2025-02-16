@@ -191,7 +191,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                         userTo.uid,
                         timestamps,
                         messageText,
-                        Constants.TYPE_TEXT
+                        Constants.TYPE_TEXT,
+                        Constants.EMOTICON_EMPTY
                     )
                 )
                 adapter.notifyItemInserted(0)
@@ -328,6 +329,12 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 .setOnEmojiSelectedListener(object : OnEmoticonSelectedListener{
                     override fun onEmoticonSelected(emoticon: Emoticon) {
                         Log.e("onEmoticonSelected", emoticon.description)
+                        //todo update message.
+                        val type = convertDrawableToType(emoticon.drawable)
+                        messages[position].emoticonType = type
+                        adapter.notifyItemChanged(position)
+                        val content = "${userTo.name} dropped your feelings and messages"
+                        viewModel.updateEmoticonType(content,messages[position].timestamp, type, userTo.token)
                         emoticonPopup.dismiss()
 
                     }
@@ -336,7 +343,6 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             emoticonLikeTouchDetector.configure(initEmoticonConfig)
 
             reactEmoticonView.setOnTouchListener(View.OnTouchListener { _, event ->
-                Log.e("reactEmoticonIcon", "raw :${event.rawX}/${event.rawY}")
                 emoticonLikeTouchDetector.dispatchTouchEvent(event)
                 true
             })
@@ -350,6 +356,20 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
         }
 
+    }
+
+    private fun convertDrawableToType(draw: Int): String {
+        return if (draw == R.drawable.like) {
+            Constants.EMOTICON_LIKE
+        } else (if (draw == R.drawable.haha) {
+            Constants.EMOTICON_HAHA
+        } else if (draw == R.drawable.kiss) {
+            Constants.EMOTICON_KISS
+        } else if (draw == R.drawable.p) {
+            Constants.EMOTICON_P
+        } else {
+            Constants.EMOTICON_SAD
+        }).toString()
     }
 
 }

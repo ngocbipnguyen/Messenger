@@ -16,6 +16,7 @@ class FirebaseConstants {
         const val photoUrl = "photoUrl";
         const val emailVerified = "emailVerified";
         const val token = "pushToken";
+        const val EMOTICON_TYPE = "emoticon_type";
 
 
         //message

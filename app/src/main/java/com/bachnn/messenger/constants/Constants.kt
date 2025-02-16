@@ -16,7 +16,15 @@ class Constants {
 
 
         const val NOTIFICATION_ID = 321
+        const val NOTIFICATION_EMOTICON_ID = 322
         const val CHANNEL_ID = "message_CHANNEL"
+
+        const val EMOTICON_EMPTY: String = "-1"
+        const val EMOTICON_LIKE: String = "0"
+        const val EMOTICON_HAHA: String = "1"
+        const val EMOTICON_KISS: String  = "2"
+        const val EMOTICON_P: String  = "3"
+        const val EMOTICON_SAD: String  = "4"
 
     }
 }

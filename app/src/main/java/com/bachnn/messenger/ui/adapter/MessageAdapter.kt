@@ -57,6 +57,8 @@ class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLo
         private val messageText: TextView
         private val messageImage: ImageView
         val leftView: FrameLayout
+        val emoticonFrame: FrameLayout
+        val emoticonImage: ImageView
 
 
         init {
@@ -64,6 +66,8 @@ class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLo
             messageText = view.findViewById(R.id.left_message_text)
             messageImage = view.findViewById(R.id.left_message_image)
             leftView = view.findViewById(R.id.left_view)
+            emoticonFrame = view.findViewById(R.id.emoticon_frame)
+            emoticonImage = view.findViewById(R.id.emoticon_icon)
         }
         override fun bind(message: Message) {
             Glide.with(view).load(user.photoUrl).into(circleImage)
@@ -75,6 +79,29 @@ class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLo
                 Glide.with(view).load(message.content).into(messageImage)
 //                messageText.visibility = View.GONE
                 messageImage.visibility = View.VISIBLE
+            }
+
+            val drawableInt = typeToDrawable(message.emoticonType)
+            if (drawableInt >= 0) {
+                emoticonImage.setImageResource(drawableInt)
+                emoticonImage.visibility = View.VISIBLE
+                emoticonFrame.visibility = View.VISIBLE
+            }
+        }
+
+        fun typeToDrawable(type: String): Int {
+            return if (type == Constants.EMOTICON_LIKE) {
+                R.drawable.like
+            } else if (type == Constants.EMOTICON_HAHA) {
+                R.drawable.haha
+            } else if (type == Constants.EMOTICON_KISS) {
+                R.drawable.kiss
+            } else if (type == Constants.EMOTICON_P) {
+                R.drawable.p
+            } else if (type == Constants.EMOTICON_SAD) {
+                R.drawable.sad
+            } else {
+                -1
             }
         }
 
