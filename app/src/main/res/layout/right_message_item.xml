@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="bottom|end"
@@ -7,56 +7,83 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <TextView
-        android:id="@+id/sending"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sending"
-        android:layout_marginEnd="8dp"
-        android:textStyle="italic"
-        android:layout_marginBottom="4dp"
-        android:textColor="@color/white"
-        android:visibility="gone"
-        />
-
     <FrameLayout
+        android:id="@+id/right_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="2dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
         <TextView
-            android:id="@+id/right_message_text"
+            android:id="@+id/sending"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_message_text"
-            android:maxWidth="280dp"
-            android:paddingStart="12dp"
-            android:paddingTop="4dp"
-            android:layout_gravity="end"
-            android:paddingEnd="12dp"
-            android:paddingBottom="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/sending"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            android:visibility="gone"
-            />
+            android:textStyle="italic"
+            android:visibility="gone" />
 
-
-        <androidx.cardview.widget.CardView
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            android:layout_gravity="end"
-            >
-            <ImageView
-                android:id="@+id/right_message_image"
-                android:layout_width="260dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/right_message_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/background_message_text"
                 android:maxWidth="280dp"
-                android:src="@drawable/icons_message"
+                android:paddingStart="12dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="4dp"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:visibility="gone" />
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                app:cardCornerRadius="12dp">
+
+                <ImageView
+                    android:id="@+id/right_message_image"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="280dp"
+                    android:src="@drawable/icons_message"
+                    android:visibility="gone" />
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/emoticon_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:visibility="gone"
+            android:background="@drawable/message_emoticon_background">
+            <ImageView
+                android:id="@+id/emoticon_icon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_margin="1dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/left_view"
+                app:layout_constraintTop_toBottomOf="parent"
+                android:src="@drawable/haha"
                 android:visibility="gone"
                 />
-        </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
     </FrameLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
