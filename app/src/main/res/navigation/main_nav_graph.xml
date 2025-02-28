@@ -53,10 +53,38 @@
         <action
             android:id="@+id/action_messengerFragment_to_mediaFragment"
             app:destination="@id/mediaFragment" />
+        <action
+            android:id="@+id/action_messengerFragment_to_videoCallingFragment"
+            app:destination="@id/videoCallingFragment" />
+        <action
+            android:id="@+id/action_messengerFragment_to_voiceCallingFragment"
+            app:destination="@id/voiceCallingFragment" />
     </fragment>
     <fragment
         android:id="@+id/mediaFragment"
         android:name="com.bachnn.messenger.ui.fragment.MediaFragment"
         android:label="MediaFragment"
         tools:layout="@layout/media_fragment"/>
+    <fragment
+        android:id="@+id/videoCallingFragment"
+        android:name="com.bachnn.messenger.ui.fragment.VideoCallingFragment"
+        android:label="VideoCallingFragment"
+        tools:layout="@layout/video_calling_fragment">
+        <argument
+            android:name="userArg"
+            app:argType="com.bachnn.messenger.data.model.User"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+    </fragment>
+    <fragment
+        android:id="@+id/voiceCallingFragment"
+        android:name="com.bachnn.messenger.ui.fragment.VoiceCallingFragment"
+        android:label="VoiceCallingFragment"
+        tools:layout="@layout/video_calling_fragment">
+        <argument
+            android:name="userArg"
+            app:argType="com.bachnn.messenger.data.model.User"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+    </fragment>
 </navigation>

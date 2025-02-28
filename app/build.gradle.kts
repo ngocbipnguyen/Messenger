@@ -125,4 +125,6 @@ dependencies {
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
 
+    implementation("io.agora.rtc:voice-sdk:4.5.0")
+
 }

@@ -1,9 +1,14 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
@@ -30,12 +35,14 @@ import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bachnn.messenger.databinding.MessengerFragmentBinding
 import com.bachnn.messenger.ui.adapter.MessageAdapter
+import com.bachnn.messenger.ui.service.VideoCallingService
 import com.bachnn.messenger.ui.view.custom.Emoticon
 import com.bachnn.messenger.ui.view.custom.EmoticonLikeTouchDetector
 import com.bachnn.messenger.ui.view.custom.OnEmoticonSelectedListener
 import com.bachnn.messenger.ui.view.custom.EmoticonGroupView
 import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
+import com.google.firestore.v1.FirestoreGrpc.bindService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
@@ -60,6 +67,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
     private lateinit var emoticonLikeTouchDetector: EmoticonLikeTouchDetector
 
+    val REQUEST_CODE_WINDOW = 22
 
     // Register ActivityResult handler
     private val requestPermissions =
@@ -112,6 +120,15 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         }
     }
 
+
+    private val overlayPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (Settings.canDrawOverlays(requireContext())) {
+
+            } else {
+
+            }
+        }
 
     override fun createViewModel(): MessengerViewModel {
         return ViewModelProvider(this)[MessengerViewModel::class]
@@ -213,6 +230,43 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         }
 
 //        PushNotification.showNotification(requireContext(), "bachnn","hello world!", User("rMqi1TSgInX1kTEFwnvyaf0h4bs2","","","","",""))
+
+        setHasOptionsMenu(true)
+
+        binding.messengerToolbar.inflateMenu(R.menu.message_menu)
+
+        binding.messengerToolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_call -> {
+                    Log.e("onOptionsItemSelected", "action_call")
+
+                    if (!Settings.canDrawOverlays(requireContext())) {
+                        requestOverlayPermission()
+                    } else {
+
+                        binding.root.findNavController().navigate(R.id.action_messengerFragment_to_voiceCallingFragment,
+                            Bundle().apply {
+                                putSerializable("userArg", userTo)
+                            })
+                    }
+                    // Navigate to settings screen.
+                    true
+                }
+                R.id.action_video -> {
+                    // Save profile changes.
+                    if (!Settings.canDrawOverlays(requireContext())) {
+                        requestOverlayPermission()
+                    } else {
+                        binding.root.findNavController().navigate(R.id.action_messengerFragment_to_videoCallingFragment,
+                            Bundle().apply {
+                                putSerializable("userArg", userTo)
+                            })
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
 
     }
 
@@ -365,6 +419,14 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         } else {
             Constants.EMOTICON_SAD
         }).toString()
+    }
+
+    private fun requestOverlayPermission() {
+        val intent = Intent(
+            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:${requireContext().packageName}")
+        )
+        overlayPermissionLauncher.launch(intent)
     }
 
 }
