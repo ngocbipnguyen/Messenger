@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.bachnn.messenger.R
 import com.bachnn.messenger.base.BaseViewModel
 import com.bachnn.messenger.constants.Constants
 import com.bachnn.messenger.constants.FirebaseConstants
@@ -133,8 +134,12 @@ class MessengerViewModel @Inject constructor(
             .set(messageData).addOnCompleteListener{
                 // todo push notification..
                 _isVisibilitySending.postValue(false)
-
-                pushMessageNotification(content, auth.currentUser!!.displayName!!,token, Constants.EMOTICON_EMPTY)
+                val contentNotification: String = if (type == Constants.TYPE_IMAGE) {
+                    auth.currentUser!!.displayName!! +" "+ context.getString(R.string.image_content)
+                } else {
+                    content
+                }
+                pushMessageNotification(contentNotification, auth.currentUser!!.displayName!!,token, Constants.EMOTICON_EMPTY)
             }
 
     }

@@ -2,6 +2,7 @@ package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -14,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.setFragmentResultListener
@@ -36,8 +38,10 @@ import com.bachnn.messenger.ui.view.custom.OnEmoticonSelectedListener
 import com.bachnn.messenger.ui.view.custom.EmoticonGroupView
 import com.bachnn.messenger.ui.view.custom.InitEmoticonConfig
 import com.bachnn.messenger.ui.viewModel.MessengerViewModel
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -109,6 +113,12 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 dateCamera = Date()
                 uploadImages(it)
             }
+        }
+    }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {results ->
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            openCamera()
         }
     }
 
@@ -204,7 +214,15 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
         binding.cameraIcon.setOnClickListener {
             //todo open camera.
-            openCamera()
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                openCamera()
+            } else {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            }
         }
 
         binding.photoIcon.setOnClickListener {
@@ -247,12 +265,12 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
     private suspend fun uploadImages(uriImage: Uri) {
         val timestamps = dateCamera.time.toString()
-//        val folderMedia = "${viewModel.group}/$timestamps"
-//        FirebaseStorage.getInstance().reference.child(folderMedia).putFile(uriImage).await()
-//        val url = FirebaseStorage.getInstance().reference.child(folderMedia).downloadUrl.await()
-//
-//        Log.e("uploadImages", "url : $url")
-        viewModel.sendMessage(userTo.uid, uriImage.toString(), Constants.TYPE_IMAGE, timestamps, userTo.token)
+        val folderMedia = "${viewModel.group}/$timestamps"
+        FirebaseStorage.getInstance().reference.child(folderMedia).putFile(uriImage).await()
+        val url = FirebaseStorage.getInstance().reference.child(folderMedia).downloadUrl.await()
+
+        Log.e("uploadImages", "url : $url")
+        viewModel.sendMessage(userTo.uid, url.toString(), Constants.TYPE_IMAGE, timestamps, userTo.token)
 
     }
 
