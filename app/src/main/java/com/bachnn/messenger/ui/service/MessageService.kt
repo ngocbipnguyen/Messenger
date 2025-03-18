@@ -16,15 +16,17 @@ class MessageService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        val uid = auth.currentUser?.uid
-        val mapUser: MutableMap<String, Any> = HashMap()
-        mapUser[FirebaseConstants.token] = token
+        auth.currentUser?.let {
+            val uid = it.uid
+            val mapUser: MutableMap<String, Any> = HashMap()
+            mapUser[FirebaseConstants.token] = token
 
-        FirebaseFirestore.getInstance().collection(FirebaseConstants.pathUser).document(uid!!)
-            .update(mapUser)
-            .addOnCompleteListener(OnCompleteListener {
+            FirebaseFirestore.getInstance().collection(FirebaseConstants.pathUser).document(uid!!)
+                .update(mapUser)
+                .addOnCompleteListener(OnCompleteListener {
 
-            })
+                })
+        }
     }
 
 

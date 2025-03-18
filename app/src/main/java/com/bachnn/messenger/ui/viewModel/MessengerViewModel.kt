@@ -177,7 +177,7 @@ class MessengerViewModel @Inject constructor(
             val serverKey = PushNotification.getAccessToken(context)
 
             val request = Request.Builder()
-                .url("https://fcm.googleapis.com/v1/projects/messenger-7c6e4/messages:send")
+                .url("https://fcm.googleapis.com/v1/projects/chatapp-e3c21/messages:send")
                 .addHeader("Authorization", "Bearer $serverKey")
                 .addHeader("Content-Type", "application/json")
                 .post(json.toRequestBody("application/json".toMediaType()))

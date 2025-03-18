@@ -1,9 +1,14 @@
 package com.bachnn.messenger.ui.fragment
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -27,6 +32,10 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
 
     lateinit var adapter : HomeAdapter
 
+    private val notificationPermissionLaunch = registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
+
+        }
+
     override fun createViewModel(): HomeViewModel {
         return ViewModelProvider(this)[HomeViewModel::class.java]
     }
@@ -39,6 +48,15 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
     }
 
     override fun initView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_DENIED
+            ) {
+                notificationPermissionLaunch.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
 
         binding.navigationHome.setNavigationItemSelectedListener { item ->
             binding.drawerHome.closeDrawers()
