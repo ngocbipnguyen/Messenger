@@ -1,5 +1,13 @@
 package com.bachnn.messenger.ui.adapter
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.drawable.Drawable
+import android.media.ExifInterface
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnLongClickListener
@@ -13,13 +21,39 @@ import com.bachnn.messenger.constants.Constants
 import com.bachnn.messenger.data.model.Message
 import com.bachnn.messenger.data.model.User
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import de.hdodenhof.circleimageview.CircleImageView
+import java.io.InputStream
+import java.net.URL
+import java.net.URLConnection
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLongClick: (View, Int) -> Unit) :
     RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
     abstract class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
         abstract fun bind(message: Message)
+
+        fun setImageParams(image: ImageView, width: Int, height: Int) {
+            val max: Int = view.context.resources.getDimensionPixelSize(R.dimen.max_image)
+            if (width > max || height > max) {
+                val layoutParams: ViewGroup.LayoutParams = image.layoutParams
+
+                if (width > height) {
+                    layoutParams.width = max
+                    layoutParams.height = height * max / width
+                } else {
+                    layoutParams.width = width * max / height
+                    layoutParams.height = max
+                }
+                image.layoutParams = layoutParams
+            }
+        }
+
     }
 
     //right message.
@@ -45,7 +79,23 @@ class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLo
                 messageText.visibility = View.VISIBLE
                 messageImage.visibility = View.GONE
             } else {
-                Glide.with(view).load(message.content).into(messageImage)
+                Glide.with(view).asBitmap().load(message.content).into(object :CustomTarget<Bitmap>(){
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        val width = resource.width
+                        val height = resource.height
+                        Log.e("onResourceReady", "width : $width/$height")
+                        setImageParams(messageImage, width, height)
+                        messageImage.setImageBitmap(resource)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                    }
+
+                })
+//                runGenBitmap(message.content, messageImage)
                 messageText.visibility = View.GONE
                 messageImage.visibility = View.VISIBLE
             }
@@ -101,7 +151,24 @@ class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLo
                 messageText.visibility = View.VISIBLE
 //                messageImage.visibility = View.GONE
             } else {
-                Glide.with(view).load(message.content).into(messageImage)
+//                Glide.with(view).load(message.content).into(messageImage)
+                Glide.with(view).asBitmap().load(message.content).into(object :CustomTarget<Bitmap>(){
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        val width = resource.width
+                        val height = resource.height
+                        Log.e("onResourceReady", "width : $width/$height")
+                        setImageParams(messageImage, width, height)
+                        messageImage.setImageBitmap(resource)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                    }
+
+                })
+//                runGenBitmap(message.content, messageImage)
 //                messageText.visibility = View.GONE
                 messageImage.visibility = View.VISIBLE
             }

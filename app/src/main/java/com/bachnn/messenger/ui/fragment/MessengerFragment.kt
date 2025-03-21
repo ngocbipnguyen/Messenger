@@ -1,8 +1,14 @@
 package com.bachnn.messenger.ui.fragment
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -43,6 +49,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -102,16 +109,26 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         if (it) {
             // save image in cloud and delete file image save in cache.
             lifecycleScope.launch {
+                //show item
+                showTemplateMessage(uriImage)
+                uriImage = uploadResizedImage(uriImage)
                 uploadImages(uriImage)
             }
         }
+    }
+
+    private fun showTemplateMessage(uriImage: Uri) {
+        messages.add(0,Message(viewModel.auth.uid!!, userTo.uid,dateCamera.time.toString(), uriImage.toString(), Constants.TYPE_IMAGE, Constants.EMOTICON_EMPTY))
+        adapter.notifyItemChanged(0)
     }
 
     private val getGalleryIntent = registerForActivityResult(ActivityResultContracts.GetContent()) {
         lifecycleScope.launch {
             it?.let {
                 dateCamera = Date()
-                uploadImages(it)
+                showTemplateMessage(it)
+                val uri = uploadResizedImage(it)
+                uploadImages(uri)
             }
         }
     }
@@ -121,6 +138,89 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             openCamera()
         }
     }
+
+    private fun resizeImageFromUri(context: Context, uri: Uri, maxWidth: Int, maxHeight: Int): Bitmap? {
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+
+        context.contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, options)
+        }
+
+        options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight)
+        options.inJustDecodeBounds = false
+
+        return context.contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, options)
+        }
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
+    }
+
+    private fun bitmapToFile(context: Context, bitmap: Bitmap, fileName: String): File {
+        val file = File(context.cacheDir, fileName)
+        val stream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream) // 80% Quality
+        stream.flush()
+        stream.close()
+        return file
+    }
+
+
+    private fun uploadResizedImage(uri: Uri): Uri {
+        var bitmap: Bitmap? = resizeImageFromUri(requireContext(), uri, 640, 640)
+        val degrees = getImageRotation(requireContext(), uri)
+        bitmap = rotateBitmap(bitmap!!, degrees)
+        val date = Date()
+        val formatDate = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss")
+        val strDate = formatDate.format(date)
+        val nameFile = "${requireContext().getString(R.string.app_name)}_$strDate.jpg"
+        val file = bitmapToFile(requireContext(),bitmap!!, nameFile)
+        return FileProvider.getUriForFile(requireContext(), "com.bachnn.messenger", file)
+    }
+
+    private fun getImageRotation(context: Context, uri: Uri): Int {
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val exif = inputStream?.let { ExifInterface(it) }
+            val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            inputStream?.close()
+
+            return when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return 0
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
+        if (degrees == 0) return bitmap // No need to rotate
+
+        val matrix = Matrix()
+        matrix.postRotate(degrees.toFloat())
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
 
 
     override fun createViewModel(): MessengerViewModel {
@@ -162,6 +262,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 messages.clear()
                 messages.addAll(it)
                 adapter.notifyDataSetChanged()
+                scrollBottom()
             }
         })
 
@@ -372,17 +473,28 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     }
 
     private fun convertDrawableToType(draw: Int): String {
-        return if (draw == R.drawable.like) {
-            Constants.EMOTICON_LIKE
-        } else (if (draw == R.drawable.haha) {
-            Constants.EMOTICON_HAHA
-        } else if (draw == R.drawable.kiss) {
-            Constants.EMOTICON_KISS
-        } else if (draw == R.drawable.p) {
-            Constants.EMOTICON_P
-        } else {
-            Constants.EMOTICON_SAD
-        }).toString()
+        return when (draw) {
+            R.drawable.like -> {
+                Constants.EMOTICON_LIKE
+            }
+            R.drawable.haha -> {
+                Constants.EMOTICON_HAHA
+            }
+            R.drawable.kiss -> {
+                Constants.EMOTICON_KISS
+            }
+            else -> if (draw == R.drawable.p) {
+                Constants.EMOTICON_P
+            } else {
+                Constants.EMOTICON_SAD
+            }.toString()
+        }
+    }
+
+    private fun scrollBottom() {
+        binding.messengerRecycler.post {
+            binding.messengerRecycler.scrollToPosition(0)
+        }
     }
 
 }
