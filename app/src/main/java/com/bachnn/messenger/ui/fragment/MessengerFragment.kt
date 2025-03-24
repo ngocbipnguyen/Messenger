@@ -66,7 +66,11 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     var messages = ArrayList<Message>()
 
     private lateinit var uriImage: Uri
-    private lateinit var pathFile: File
+
+    private var rootFile: File? = null
+    private var pathFile: File? = null
+    private var newFile: File? = null
+
     private lateinit var dateCamera: Date
 
     private lateinit var emoticonLikeTouchDetector: EmoticonLikeTouchDetector
@@ -112,6 +116,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 //show item
                 showTemplateMessage(uriImage)
                 uriImage = uploadResizedImage(uriImage)
+                adapter.notifyItemChanged(0)
                 uploadImages(uriImage)
             }
         }
@@ -119,7 +124,6 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
 
     private fun showTemplateMessage(uriImage: Uri) {
         messages.add(0,Message(viewModel.auth.uid!!, userTo.uid,dateCamera.time.toString(), uriImage.toString(), Constants.TYPE_IMAGE, Constants.EMOTICON_EMPTY))
-        adapter.notifyItemChanged(0)
     }
 
     private val getGalleryIntent = registerForActivityResult(ActivityResultContracts.GetContent()) {
@@ -128,6 +132,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
                 dateCamera = Date()
                 showTemplateMessage(it)
                 val uri = uploadResizedImage(it)
+                adapter.notifyItemChanged(0)
                 uploadImages(uri)
             }
         }
@@ -172,7 +177,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
     }
 
     private fun bitmapToFile(context: Context, bitmap: Bitmap, fileName: String): File {
-        val file = File(context.cacheDir, fileName)
+        val file = File(rootFile(), fileName)
         val stream = FileOutputStream(file)
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream) // 80% Quality
         stream.flush()
@@ -189,8 +194,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         val formatDate = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss")
         val strDate = formatDate.format(date)
         val nameFile = "${requireContext().getString(R.string.app_name)}_$strDate.jpg"
-        val file = bitmapToFile(requireContext(),bitmap!!, nameFile)
-        return FileProvider.getUriForFile(requireContext(), "com.bachnn.messenger", file)
+        newFile = bitmapToFile(requireContext(),bitmap!!, nameFile)
+        return FileProvider.getUriForFile(requireContext(), "com.bachnn.messenger", newFile!!)
     }
 
     private fun getImageRotation(context: Context, uri: Uri): Int {
@@ -243,7 +248,10 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             if (uri != null) {
                 lifecycleScope.launch {
                     dateCamera = Date()
-                    uploadImages(uri.toUri())
+                    showTemplateMessage(uri.toUri())
+                    val uri = uploadResizedImage(uri.toUri())
+                    adapter.notifyItemChanged(0)
+                    uploadImages(uri)
                 }
             }
         }
@@ -356,7 +364,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         val strDate = formatDate.format(dateCamera)
 
         val pathFile = File(
-            requireContext().cacheDir,
+            rootFile(),
             "${requireContext().getString(R.string.app_name)}_$strDate.jpg"
         )
         this.pathFile = pathFile
@@ -373,6 +381,12 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         Log.e("uploadImages", "url : $url")
         viewModel.sendMessage(userTo.uid, url.toString(), Constants.TYPE_IMAGE, timestamps, userTo.token)
 
+        if (pathFile != null) {
+            pathFile?.delete()
+        }
+        if (newFile != null) {
+            newFile?.delete()
+        }
     }
 
     /*todo gallery*/
@@ -495,6 +509,14 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         binding.messengerRecycler.post {
             binding.messengerRecycler.scrollToPosition(0)
         }
+    }
+
+    private fun rootFile() : File {
+        rootFile = File(requireContext().cacheDir, Constants.MEDIA_CACHE)
+        if (rootFile?.exists() == false) {
+            rootFile?.mkdir()
+        }
+        return rootFile!!
     }
 
 }

@@ -26,5 +26,8 @@ class Constants {
         const val EMOTICON_P: String  = "3"
         const val EMOTICON_SAD: String  = "4"
 
+        // cache
+        const val MEDIA_CACHE = "medias"
+
     }
 }
