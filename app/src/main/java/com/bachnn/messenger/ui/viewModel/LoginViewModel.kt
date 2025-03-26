@@ -83,7 +83,7 @@ class LoginViewModel @Inject constructor(private val auth: FirebaseAuth, private
                                         mapUser[FirebaseConstants.name] = user?.displayName!!
                                         mapUser[FirebaseConstants.email] = user.email!!
                                         mapUser[FirebaseConstants.photoUrl] = user.photoUrl!!
-                                        mapUser[FirebaseConstants.emailVerified] = user.photoUrl!!
+                                        mapUser[FirebaseConstants.emailVerified] = ""
 
                                         firebaseStore.collection(FirebaseConstants.pathUser)
                                             .document(user.uid).set(mapUser)
@@ -110,8 +110,7 @@ class LoginViewModel @Inject constructor(private val auth: FirebaseAuth, private
                                             mapUser[FirebaseConstants.name] = user?.displayName!!
                                             mapUser[FirebaseConstants.email] = user.email!!
                                             mapUser[FirebaseConstants.photoUrl] = user.photoUrl!!
-                                            mapUser[FirebaseConstants.emailVerified] =
-                                                user.photoUrl!!
+                                            mapUser[FirebaseConstants.emailVerified] = ""
 
                                             firebaseStore.collection(FirebaseConstants.pathUser)
                                                 .document(user.uid).set(mapUser)

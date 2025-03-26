@@ -85,6 +85,8 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
             }
         })
 
+        viewModel.setListenerUser()
+
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener {
             if (!it.isSuccessful) {

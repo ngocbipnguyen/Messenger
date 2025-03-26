@@ -139,6 +139,14 @@ class MessengerViewModel @Inject constructor(
                 } else {
                     content
                 }
+                // todo update subtitle of user in home screen
+                val user : MutableMap<String, Any> = HashMap()
+                user[FirebaseConstants.emailVerified] = contentNotification
+                user[FirebaseConstants.timestamp] = timestamps
+                viewModelScope.launch {
+                    fireStore.collection(FirebaseConstants.pathUser).document(toID).update(user).await()
+                    fireStore.collection(FirebaseConstants.pathUser).document(auth.currentUser?.uid!!).update(user).await()
+                }
                 pushMessageNotification(contentNotification, auth.currentUser!!.displayName!!,token, Constants.EMOTICON_EMPTY)
             }
 

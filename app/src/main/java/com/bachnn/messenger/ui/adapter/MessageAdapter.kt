@@ -149,7 +149,7 @@ class MessageAdapter(val messages: List<Message>, val user: User, val emoticonLo
             if (message.type == Constants.TYPE_TEXT) {
                 messageText.text = message.content
                 messageText.visibility = View.VISIBLE
-//                messageImage.visibility = View.GONE
+                messageImage.visibility = View.GONE
             } else {
 //                Glide.with(view).load(message.content).into(messageImage)
                 Glide.with(view).asBitmap().load(message.content).into(object :CustomTarget<Bitmap>(){

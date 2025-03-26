@@ -33,7 +33,7 @@ class HomeAdapter(private val users: List<User>,val onClickUser:(User) -> Unit):
             this.user = user
 //            personImage.setImageURI(user)
             username.text = user.name
-            email.text = user.email
+            email.text = user.emailVerified
 
         }
     }

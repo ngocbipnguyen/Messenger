@@ -9,7 +9,9 @@ import com.bachnn.messenger.constants.FirebaseConstants
 import com.bachnn.messenger.data.model.User
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -52,7 +54,9 @@ class HomeViewModel @Inject constructor(
             }
 
 
-            val userDocs = fireStore.collection(FirebaseConstants.pathUser).get().await()
+            val userDocs = fireStore.collection(FirebaseConstants.pathUser)
+                .orderBy(FirebaseConstants.timestamp, Query.Direction.DESCENDING)
+                .get().await()
 
             if (userDocs.documents.size > 0) {
                 val listUser = ArrayList<User>()
@@ -84,6 +88,40 @@ class HomeViewModel @Inject constructor(
 
 
     }
+
+    fun setListenerUser() {
+        fireStore.collection(FirebaseConstants.pathUser)
+            .orderBy(FirebaseConstants.timestamp, Query.Direction.DESCENDING)
+            .addSnapshotListener(EventListener { value, error ->
+                val updateUser = ArrayList<User>()
+                val docs = value?.documents
+                if (docs?.size != null) {
+                    docs.forEach { doc ->
+                        if (doc.id != currentUser.value?.uid) {
+                            val name = doc.getString(FirebaseConstants.name).toString()
+                            val email = doc.getString(FirebaseConstants.email).toString()
+                            val photoUrl = doc.getString(FirebaseConstants.photoUrl).toString()
+                            val emailVerified =
+                                doc.getString(FirebaseConstants.emailVerified).toString()
+                            val token = doc.getString(FirebaseConstants.token).toString()
+                            updateUser.add(
+                                User(
+                                    doc.id,
+                                    name,
+                                    email,
+                                    photoUrl,
+                                    emailVerified,
+                                    token
+                                )
+                            )
+                            _users.postValue(updateUser)
+                        }
+                    }
+                }
+            })
+    }
+
+
 
     fun sendRegistrationToServer(token: String) {
         val uid = auth.currentUser?.uid

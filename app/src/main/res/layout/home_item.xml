@@ -38,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Email"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@+id/person_user"
         app:layout_constraintEnd_toEndOf="@+id/name_edit"
         app:layout_constraintStart_toStartOf="@+id/name_edit"
