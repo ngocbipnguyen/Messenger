@@ -17,6 +17,7 @@ class FirebaseConstants {
         const val emailVerified = "emailVerified";
         const val token = "pushToken";
         const val EMOTICON_TYPE = "emoticon_type";
+        const val OPEN_TALK_TIME = "openTalkTime"
 
 
         //message

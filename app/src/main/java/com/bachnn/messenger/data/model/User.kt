@@ -13,5 +13,12 @@ class User(
     @ColumnInfo(name = "email") val email: String,
     @ColumnInfo(name = "photoUrl") val photoUrl: String,
     @ColumnInfo(name = "emailVerified") val emailVerified: String,
-    @ColumnInfo(name = "pushToken") val token: String
-) : java.io.Serializable
+    @ColumnInfo(name = "pushToken") val token: String,
+    val openTime: String = "",
+    var numberUnread: String = ""
+) : java.io.Serializable {
+
+    override fun toString(): String {
+        return "User(uid='$uid', name='$name', email='$email', photoUrl='$photoUrl', emailVerified='$emailVerified', token='$token', openTime='$openTime', numberUnread='$numberUnread')"
+    }
+}

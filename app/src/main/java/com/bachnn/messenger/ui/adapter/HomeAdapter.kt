@@ -17,12 +17,14 @@ class HomeAdapter(private val users: List<User>,val onClickUser:(User) -> Unit):
         private val email: TextView
         private val viewGroup : ConstraintLayout
         lateinit var user: User
+        private val numberUnread: TextView
 
         init {
             viewGroup = view.findViewById(R.id.home_item_id)
             personImage = view.findViewById(R.id.person_user)
             username = view.findViewById(R.id.name_edit)
             email = view.findViewById(R.id.email_user)
+            numberUnread = view.findViewById(R.id.number_unread)
 
             viewGroup.setOnClickListener {
                 onClickUser(user)
@@ -34,6 +36,10 @@ class HomeAdapter(private val users: List<User>,val onClickUser:(User) -> Unit):
 //            personImage.setImageURI(user)
             username.text = user.name
             email.text = user.emailVerified
+            if (user.numberUnread != "" && user.numberUnread != "0") {
+                numberUnread.visibility = View.VISIBLE
+                numberUnread.text = user.numberUnread
+            }
 
         }
     }

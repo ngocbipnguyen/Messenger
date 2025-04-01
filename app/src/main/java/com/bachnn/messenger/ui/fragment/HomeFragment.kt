@@ -22,6 +22,12 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -31,6 +37,8 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
     private var listUsers = ArrayList<User>()
 
     lateinit var adapter : HomeAdapter
+
+    private var job: Job? = null
 
     private val notificationPermissionLaunch = registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
 
@@ -69,6 +77,7 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
         }
 
         adapter = HomeAdapter(listUsers, onClickUser = {
+            viewModel.updateOpenTime(it.uid)
             val action = HomeFragmentDirections.actionHomeFragmentToMessengerFragment()
             action.userArg = it
             binding.root.findNavController().navigate(action)
@@ -100,4 +109,30 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
         PushNotification.createNotificationChannel(requireContext())
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        startRepeatingTask()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopRepeating()
+    }
+
+    private fun startRepeatingTask() {
+        job = CoroutineScope(Dispatchers.IO).launch {
+            while(isActive) {
+                viewModel.updateUnread(updateUnread = {
+                    adapter.notifyDataSetChanged()
+                })
+                delay(3000)
+            }
+        }
+    }
+
+    private fun stopRepeating() {
+        job?.cancel()
+    }
+
 }

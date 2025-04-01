@@ -15,6 +15,7 @@ import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,6 +41,7 @@ class HomeViewModel @Inject constructor(
                 val photoUrl = doc.getString(FirebaseConstants.photoUrl).toString()
                 val emailVerified = doc.getString(FirebaseConstants.emailVerified).toString()
                 val token = doc.getString(FirebaseConstants.token).toString()
+                val openTime = doc.getString(FirebaseConstants.OPEN_TALK_TIME).toString()
 
                 _currentUser.postValue(
                     User(
@@ -48,7 +50,9 @@ class HomeViewModel @Inject constructor(
                         email,
                         photoUrl,
                         emailVerified,
-                        token
+                        token,
+                        openTime,
+                        ""
                     )
                 )
             }
@@ -67,6 +71,7 @@ class HomeViewModel @Inject constructor(
                         val photoUrl = it.getString(FirebaseConstants.photoUrl).toString()
                         val emailVerified = it.getString(FirebaseConstants.emailVerified).toString()
                         val token = it.getString(FirebaseConstants.token).toString()
+                        val openTime = it.getString(FirebaseConstants.OPEN_TALK_TIME).toString()
                         listUser.add(
                             User(
                                 it.id,
@@ -74,7 +79,9 @@ class HomeViewModel @Inject constructor(
                                 email,
                                 photoUrl,
                                 emailVerified,
-                                token
+                                token,
+                                openTime,
+                                ""
                             )
                         )
                     }
@@ -104,6 +111,7 @@ class HomeViewModel @Inject constructor(
                             val emailVerified =
                                 doc.getString(FirebaseConstants.emailVerified).toString()
                             val token = doc.getString(FirebaseConstants.token).toString()
+                            val openTime = doc.getString(FirebaseConstants.OPEN_TALK_TIME).toString()
                             updateUser.add(
                                 User(
                                     doc.id,
@@ -111,12 +119,14 @@ class HomeViewModel @Inject constructor(
                                     email,
                                     photoUrl,
                                     emailVerified,
-                                    token
+                                    token,
+                                    openTime,
+                                    ""
                                 )
                             )
-                            _users.postValue(updateUser)
                         }
                     }
+                    _users.postValue(updateUser)
                 }
             })
     }
@@ -138,5 +148,38 @@ class HomeViewModel @Inject constructor(
                 }
             })
     }
+
+    fun updateOpenTime(uid: String) {
+        viewModelScope.launch {
+            val date = Date()
+            val mapUser: MutableMap<String, Any> = HashMap()
+            mapUser[FirebaseConstants.OPEN_TALK_TIME] = date.time.toString()
+            Log.e("updateUnread", "updateOpenTime : ${date.time} ")
+            fireStore.collection(FirebaseConstants.pathUser).document(uid).update(mapUser).await()
+        }
+    }
+
+    fun updateUnread(updateUnread:() -> Unit) {
+
+        viewModelScope.launch {
+            _users.value?.forEach {it ->
+                val group = if (auth.currentUser?.uid!! > it.uid) {
+                    "${_currentUser.value?.uid}-${it.uid}"
+                } else {
+                    "${it.uid}-${_currentUser.value?.uid}"
+                }
+
+                val docs = fireStore.collection(FirebaseConstants.pathMessages).document(group)
+                    .collection(group)
+                    .whereGreaterThan(FirebaseConstants.timestamp, it.openTime).limit(30)
+                    .orderBy(FirebaseConstants.timestamp, Query.Direction.DESCENDING)
+                    .get().await()
+
+                it.numberUnread = docs.size().toString()
+                updateUnread()
+            }
+        }
+    }
+
 
 }
