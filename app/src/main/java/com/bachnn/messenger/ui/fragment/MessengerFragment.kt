@@ -519,4 +519,9 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
         return rootFile!!
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.updateOpenTime(userTo.uid)
+    }
+
 }

@@ -104,7 +104,7 @@ class HomeViewModel @Inject constructor(
                 val docs = value?.documents
                 if (docs?.size != null) {
                     docs.forEach { doc ->
-                        if (doc.id != currentUser.value?.uid) {
+                        if (doc.id != auth.currentUser?.uid.toString()) {
                             val name = doc.getString(FirebaseConstants.name).toString()
                             val email = doc.getString(FirebaseConstants.email).toString()
                             val photoUrl = doc.getString(FirebaseConstants.photoUrl).toString()

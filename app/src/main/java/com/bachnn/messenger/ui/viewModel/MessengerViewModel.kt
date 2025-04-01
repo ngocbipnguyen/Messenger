@@ -241,6 +241,15 @@ class MessengerViewModel @Inject constructor(
             }
     }
 
+    fun updateOpenTime(uid: String) {
+        viewModelScope.launch {
+            val date = Date()
+            val mapUser: MutableMap<String, Any> = HashMap()
+            mapUser[FirebaseConstants.OPEN_TALK_TIME] = date.time.toString()
+            Log.e("updateUnread", "updateOpenTime : ${date.time} ")
+            fireStore.collection(FirebaseConstants.pathUser).document(uid).update(mapUser).await()
+        }
+    }
 
 
 }
