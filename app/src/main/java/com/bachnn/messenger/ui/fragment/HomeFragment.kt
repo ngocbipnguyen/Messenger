@@ -71,10 +71,10 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
             throw UnsupportedOperationException("Not yet implemented")
         }
 
-
-        binding.iconToolbar.setOnClickListener {
-            binding.drawerHome.open()
-        }
+//
+//        binding.iconToolbar.setOnClickListener {
+//            binding.drawerHome.open()
+//        }
 
         adapter = HomeAdapter(listUsers, onClickUser = {
             viewModel.updateOpenTime(it.uid)

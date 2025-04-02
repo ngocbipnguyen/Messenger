@@ -256,7 +256,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel, MessengerFragmentBind
             }
         }
 
-        binding.messengerToolbar.title = userTo.name
+        binding.toolbarApp.title = userTo.name
 
         adapter = MessageAdapter(messages, userTo, emoticonLongClick = {view, position ->
             reactEmoticonIcon(binding.messengerRecycler, binding.messengerRecycler.layoutManager as LinearLayoutManager, position, view)

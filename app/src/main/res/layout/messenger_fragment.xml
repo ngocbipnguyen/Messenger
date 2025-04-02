@@ -8,14 +8,22 @@
         android:layout_height="match_parent"
         android:background="@color/black">
 
-        <Toolbar
+        <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/messenger_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:titleTextColor="@color/white"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_app"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:titleTextColor="@color/white"
+                android:background="@color/black"
+                />
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messenger_recycler"
