@@ -29,12 +29,8 @@ class MainActivity : AppCompatActivity() {
                     systemBars.right,
                     systemBars.bottom
                 )
-                view.setBackgroundColor(getColor(R.color.black))
                 insets
             }
-        } else {
-            window.navigationBarColor = getColor(R.color.black)
-            window.statusBarColor = getColor(R.color.black)
         }
     }
 

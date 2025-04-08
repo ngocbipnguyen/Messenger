@@ -32,7 +32,7 @@
         android:name=".MessengerApplication"
         android:roundIcon="@drawable/icons_message"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Messenger"
+        android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -41,7 +41,14 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.intent.action.SEARCH" />
+
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
 
