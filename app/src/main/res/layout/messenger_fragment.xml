@@ -75,7 +75,7 @@
                 android:layout_width="0dp"
                 android:background="@drawable/border_edit_text"
                 android:hint="Send message..."
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:inputType="textShortMessage"
                 android:padding="5dp"
                 android:layout_height="wrap_content"/>

@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="@string/sending"
-            android:textColor="@color/white"
             android:textStyle="italic"
             android:visibility="gone" />
 
